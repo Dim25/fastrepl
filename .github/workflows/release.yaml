@@ -1,0 +1,36 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PYPI_API_KEY: ${{ secrets.PYPI_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Task
+        uses: arduino/setup-task@v1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install poetry 1.5.1
+        run: |
+          python -m ensurepip
+          python -m pip install --upgrade pip
+          python -m pip install poetry==1.5.1
+
+      - name: Install dependencies
+        run: task install
+
+      - name: Publish to PyPI
+        run: |
+          task pre-publish
+          task publish

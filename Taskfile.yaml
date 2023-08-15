@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  install: POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
+  
+  run: poetry run python3 {{.CLI_ARGS}}
+  run:examples: poetry run jupyter nbconvert --to notebook --inplace --execute examples/custom_eval.ipynb
+
+  test: poetry run pytest -m "not todo" -n auto --benchmark-disable {{.CLI_ARGS}}
+  test:ci: poetry run pytest -m "not todo" -n auto --benchmark-disable --cov=fastrepl --cov-report xml:cov.xml
+  test:todo: poetry run pytest -m "todo" -n auto -v --benchmark-disable
+  test:bench: poetry run pytest --benchmark-only tests/test_benchmark.py
+  test:cov: poetry run pytest --benchmark-disable --cov=fastrepl --cov-report=term-missing -n auto {{.CLI_ARGS}}
+
+  todo: rg "TODO" --hidden
+  fmt: poetry run black fastrepl tests
+  lint: poetry run mypy fastrepl tests
+  clean: rm -f .local/*.gv .local/*.png
+
+  add: poetry add {{.CLI_ARGS}}
+  add:dev: poetry add {{.CLI_ARGS}} --group dev
+  add:doc: poetry add {{.CLI_ARGS}} --group doc
+  add:example: poetry add {{.CLI_ARGS}} --group example
+  sync: poetry lock --no-update && poetry install --sync
+  
+  pre-publish: rm -rf dist && poetry config pypi-token.pypi $PYPI_API_KEY && poetry publish --no-cache --build --dry-run
+  publish: poetry publish
+
+  doc:install: poetry run pip install -r docs/requirements.txt
+  doc:build: rm -rf docs/_build && poetry run sphinx-build -b html docs docs/_build/html
+  doc:watch: rm -rf docs/_build && poetry run sphinx-autobuild docs/ docs/_build/html --open-browser --watch $(git rev-parse --show-toplevel)/fastrepl/
