@@ -1,10 +1,10 @@
-# FastREPL
+# ⚡♾️ FastREPL
 Fast `Run-Eval-Polish Loop` for LLM Application. Local-first and Framework agnostic.
 
 **Note: This project is still in early development stage.**
 
 ## Quick Start
-More examples can be found in [/examples](/examples).
+More examples can be found in [examples](/examples).
 
 ```bash
 pip install fastrepl
