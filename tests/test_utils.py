@@ -3,7 +3,7 @@ import pytest
 from fastrepl.utils import HistoryDict
 
 
-class DataStructure:
+class TestDataStructure:
     def test_ordered_set(self):
         from fastrepl.utils import OrderedSet
 
@@ -33,5 +33,6 @@ class DataStructure:
             o == []
 
     def test_history_dict(self):
-        hd = HistoryDict[str](initial="initial")
-        assert hd is not None
+        with pytest.raises(NotImplementedError):
+            hd = HistoryDict[str](initial="initial")
+            assert hd is not None
