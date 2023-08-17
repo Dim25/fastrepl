@@ -1,0 +1,6 @@
+[submodule "spaces/mean_reciprocal_rank"]
+	path = spaces/mean_reciprocal_rank
+	url = https://huggingface.co/spaces/fastrepl/mean_reciprocal_rank
+[submodule "spaces/mean_average_precision"]
+	path = spaces/mean_average_precision
+	url = https://huggingface.co/spaces/fastrepl/mean_average_precision
