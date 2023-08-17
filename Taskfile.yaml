@@ -17,6 +17,12 @@ tasks:
   lint: poetry run mypy fastrepl tests
   clean: rm -f .local/*.gv .local/*.png
 
+  metric:add: 
+    cmds:
+      - evaluate-cli create {{.CLI_ARGS}} --module_type "metric" --output_dir spaces --dataset_name=None --organization fastrepl
+      - sh scripts/space.sh {{.CLI_ARGS}}
+      - git submodule add https://huggingface.co/spaces/fastrepl/{{.CLI_ARGS}} spaces/{{.CLI_ARGS}}
+
   add: poetry add {{.CLI_ARGS}}
   add:dev: poetry add {{.CLI_ARGS}} --group dev
   add:doc: poetry add {{.CLI_ARGS}} --group doc
