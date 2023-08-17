@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  ci:
     strategy:
       fail-fast: false
       matrix:

@@ -4,7 +4,7 @@ on:
     types: [created, edited, deleted]
 
 jobs:
-  handle_comment:
+  handle_comment_examples:
     name: Deploy
     if: ${{ github.event.issue.pull_request && github.event.comment.user.login == "yujonglee" && contains(github.event.comment.body, '/examples') }}
     runs-on: ubuntu-latest
