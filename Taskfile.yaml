@@ -4,7 +4,7 @@ tasks:
   install: POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
   
   run: poetry run python3 {{.CLI_ARGS}}
-  run:examples: poetry run jupyter nbconvert --to notebook --inplace --execute examples/custom_eval.ipynb
+  run:examples: poetry run jupyter nbconvert --to notebook --inplace --execute examples/*.ipynb
 
   test: poetry run pytest -m "not todo" -n auto --benchmark-disable {{.CLI_ARGS}}
   test:ci: poetry run pytest -m "not todo" -n auto --benchmark-disable --cov=fastrepl --cov-report xml:cov.xml
