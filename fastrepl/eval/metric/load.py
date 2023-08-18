@@ -1,4 +1,4 @@
-from typing import overload, get_args
+from typing import List, Any, overload, get_args
 
 from fastrepl.eval.metric.base import BaseMetricEval
 from fastrepl.eval.metric.huggingface import (
@@ -13,12 +13,16 @@ from fastrepl.eval.metric.sas import (
 
 
 @overload
-def load_metric(name: HUGGINGFACE_BUILTIN_METRICS, **kwargs) -> HuggingfaceMetric:
+def load_metric(
+    name: HUGGINGFACE_BUILTIN_METRICS, **kwargs
+) -> HuggingfaceMetric[List[Any], List[Any]]:
     ...
 
 
 @overload
-def load_metric(name: HUGGINGFACE_FASTREPL_METRICS, **kwargs) -> HuggingfaceMetric:
+def load_metric(
+    name: HUGGINGFACE_FASTREPL_METRICS, **kwargs
+) -> HuggingfaceMetric[List[Any], List[Any]]:
     ...
 
 

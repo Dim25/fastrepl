@@ -27,19 +27,44 @@ class TestHuggingfaceMetric:
     def test_metric(self, name):
         try:
             m = load_metric(name)
-            if name in ["f1"]:
+            if name == "f1":
                 # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/f1/f1.py#L52
                 result = m.compute(
-                    predictions=[0, 0, 1, 1, 0], references=[0, 1, 0, 1, 0]
+                    predictions=[0, 0, 1, 1, 0],
+                    references=[0, 1, 0, 1, 0],
                 )
-                assert result == {"f1": 0.5}
-            if name in ["exact_match"]:
+                assert result[name] == pytest.approx(0.5)
+            if name == "exact_match":
                 # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/exact_match/exact_match.py#L50
                 result = m.compute(
                     predictions=["the cat", "theater", "YELLING", "agent007"],
                     references=["cat?", "theater", "yelling", "agent"],
                 )
-                assert result == {"exact_match": 0.25}
+                assert result[name] == pytest.approx(0.25)
+
+            if name == "recall":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/recall/recall.py#L56
+                result = m.compute(
+                    predictions=[0, 1, 0, 1, 1],
+                    references=[0, 0, 1, 1, 1],
+                )
+                assert result[name] == pytest.approx(0.66, abs=1e-2)
+
+            if name == "accuracy":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/accuracy/accuracy.py#L49
+                result = m.compute(
+                    predictions=[0, 1, 1, 2, 1, 0],
+                    references=[0, 1, 2, 0, 1, 2],
+                )
+                assert result[name] == pytest.approx(0.5)
+
+            if name == "matthews_correlation":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/matthews_correlation/matthews_correlation.py#L52
+                result = m.compute(
+                    predictions=[1, 2, 2, 0, 3, 3],
+                    references=[1, 3, 2, 0, 3, 2],
+                )
+                assert result[name] == pytest.approx(0.54, abs=1e-2)
         except NotImplementedError:
             pass
 

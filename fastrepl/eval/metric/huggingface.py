@@ -1,4 +1,4 @@
-from typing import Literal, get_args
+from typing import Generic, TypeVar, Literal, get_args
 import evaluate
 
 from fastrepl.eval.metric.base import BaseMetricEval
@@ -61,14 +61,23 @@ HUGGINGFACE_BUILTIN_METRICS = Literal[
 
 HUGGINGFACE_FASTREPL_METRICS = Literal["mean_reciprocal_rank", "mean_average_precision"]
 
+Predictions = TypeVar("Predictions")
+References = TypeVar("References")
 
-class HuggingfaceMetric(BaseMetricEval):
+
+class HuggingfaceMetric(BaseMetricEval, Generic[Predictions, References]):
     __slots__ = ("name", "module")
 
     def __init__(self, name: str) -> None:
         self.name = name
 
-        CURRENTLY_SUPPORTED = ["exact_match", "f1"]
+        CURRENTLY_SUPPORTED = [
+            "exact_match",
+            "f1",
+            "recall",
+            "accuracy",
+            "matthews_correlation",
+        ]
 
         if name in get_args(HUGGINGFACE_FASTREPL_METRICS):
             raise NotImplementedError(
@@ -82,7 +91,7 @@ class HuggingfaceMetric(BaseMetricEval):
                 )
             self.module = evaluate.load(name)
 
-    def compute(self, predictions, references, **kwargs):
+    def compute(self, predictions: Predictions, references: References, **kwargs):
         return self.module.compute(
             predictions=predictions, references=references, **kwargs
         )
