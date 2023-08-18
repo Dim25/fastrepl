@@ -1,3 +1,4 @@
+# https://dev.to/zirkelc/trigger-github-workflow-for-comment-on-pull-request-45l2
 name: Handle PR Comment (/examples)
 on:
   issue_comment:
@@ -28,12 +29,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           status: pending
 
-      ### START
       - name: Checkout PR branch ${{ steps.comment-branch.outputs.head_ref }}
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
+      ### START
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
