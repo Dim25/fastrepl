@@ -49,9 +49,9 @@ jobs:
       - name: Install dependencies
         run: task install
 
-      - name: Run Examples
+      - name: Run all examples
         run: |
-          task run:examples 
+          task run:example:all
       ### END
 
       - name: Add comment to PR
