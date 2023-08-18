@@ -2,6 +2,7 @@ import pytest
 
 from typing import get_args
 from evaluate import list_evaluation_modules
+import numpy as np
 
 from fastrepl.eval.metric import load_metric
 from fastrepl.eval.metric.huggingface import (
@@ -51,33 +52,32 @@ class TestSemanticAnswerSimilarityMetric:
                 [[""]],
                 [[""]],
                 {
-                    "top_1_sas": [-6.185379],
-                    "top_k_sas": [-6.185379],
-                    "pred_label_matrix": [[[-6.1853790283203125]]],
+                    "top_1_sas": [8.154116],
+                    "top_k_sas": [8.154116],
+                    "pred_label_matrix": [[[8.154115676879883]]],
                 },
             ),
             (
                 [
-                    [
-                        "This is an example sentence.",
-                        "The quick brown fox jumps over the lazy dog.",
-                        "I enjoy reading books in my free time.",
-                    ]
+                    ["She adores reading classic novels."],
+                    ["The painting features vivid colors."],
+                    ["The sun rises in the east."],
+                    ["Good health is above wealth."],
                 ],
                 [
-                    [
-                        "An example sentence is provided.",
-                        "A lazy dog is jumped over by a quick brown fox.",
-                        "In my leisure time, I like to read books.",
-                    ]
+                    ["She loves perusing timeless literature."],
+                    ["The artwork showcases vibrant hues."],
+                    ["Bananas are a great source of potassium."],
+                    ["Can I have a cup of coffee?"],
                 ],
                 {
-                    "top_1_sas": [0.8043081, 0.9336777, 0.8648979],
-                    "top_k_sas": [0.8043081, 0.9336777, 0.8648979],
+                    "top_1_sas": [2.8915386, 3.4521167, -11.099813, -11.315325],
+                    "top_k_sas": [2.8915386, 3.4521167, -11.099813, -11.315325],
                     "pred_label_matrix": [
-                        [[0.8043081164360046]],
-                        [[0.9336776733398438]],
-                        [[0.8648979067802429]],
+                        [[2.891538619995117]],
+                        [[3.4521167278289795]],
+                        [[-11.099813461303711]],
+                        [[-11.315324783325195]],
                     ],
                 },
             ),
@@ -85,10 +85,12 @@ class TestSemanticAnswerSimilarityMetric:
     )
     def test_cross_encoder(self, predictions, references, expected):
         m = load_metric(
-            "sas", model_name_or_path="cross-encoder/ms-marco-TinyBERT-L-2-v2"
+            "sas", model_name_or_path="cross-encoder/ms-marco-MiniLM-L-12-v2"
         )
         actual = m.compute(predictions=predictions, references=references)
-        pytest.approx(expected, actual)
+        assert np.allclose(actual["top_1_sas"], expected["top_1_sas"])
+        assert np.allclose(actual["top_k_sas"], expected["top_k_sas"])
+        assert np.allclose(actual["pred_label_matrix"], expected["pred_label_matrix"])
 
     @pytest.mark.parametrize(
         "predictions, references, expected",
@@ -97,33 +99,32 @@ class TestSemanticAnswerSimilarityMetric:
                 [[""]],
                 [[""]],
                 {
-                    "top_1_sas": [-6.185379],
-                    "top_k_sas": [-6.185379],
-                    "pred_label_matrix": [[[-6.1853790283203125]]],
+                    "top_1_sas": [0.99999994],
+                    "top_k_sas": [0.99999994],
+                    "pred_label_matrix": [[[0.9999999403953552]]],
                 },
             ),
             (
                 [
-                    [
-                        "This is an example sentence.",
-                        "The quick brown fox jumps over the lazy dog.",
-                        "I enjoy reading books in my free time.",
-                    ]
+                    ["She adores reading classic novels."],
+                    ["The painting features vivid colors."],
+                    ["The sun rises in the east."],
+                    ["Good health is above wealth."],
                 ],
                 [
-                    [
-                        "An example sentence is provided.",
-                        "A lazy dog is jumped over by a quick brown fox.",
-                        "In my leisure time, I like to read books.",
-                    ]
+                    ["She loves perusing timeless literature."],
+                    ["The artwork showcases vibrant hues."],
+                    ["Bananas are a great source of potassium."],
+                    ["Can I have a cup of coffee?"],
                 ],
                 {
-                    "top_1_sas": [9.87214, 9.589075, 2.323873],
-                    "top_k_sas": [9.87214, 9.589075, 2.323873],
+                    "top_1_sas": [0.77481174, 0.7642534, 0.028543131, 0.12256175],
+                    "top_k_sas": [0.77481174, 0.7642534, 0.028543131, 0.12256175],
                     "pred_label_matrix": [
-                        [[9.872139930725098]],
-                        [[9.589075088500977]],
-                        [[2.3238730430603027]],
+                        [[0.7748117446899414]],
+                        [[0.7642533779144287]],
+                        [[0.028543131425976753]],
+                        [[0.1225617527961731]],
                     ],
                 },
             ),
@@ -134,4 +135,6 @@ class TestSemanticAnswerSimilarityMetric:
             "sas", model_name_or_path="sentence-transformers/all-MiniLM-L6-v2"
         )
         actual = m.compute(predictions=predictions, references=references)
-        pytest.approx(expected, actual)
+        assert np.allclose(actual["top_1_sas"], expected["top_1_sas"])
+        assert np.allclose(actual["top_k_sas"], expected["top_k_sas"])
+        assert np.allclose(actual["pred_label_matrix"], expected["pred_label_matrix"])
