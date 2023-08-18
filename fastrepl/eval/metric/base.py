@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class BaseMetric(ABC):
+class BaseMetricEval(ABC):
     @abstractmethod
     def compute(self, predictions, references, **kwargs):
         ...
