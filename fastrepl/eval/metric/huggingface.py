@@ -1,7 +1,7 @@
 from typing import Literal, get_args
-
 import evaluate
-from fastrepl.eval.metric.base import BaseMetric
+
+from fastrepl.eval.metric.base import BaseMetricEval
 
 HUGGINGFACE_BUILTIN_METRICS = Literal[
     "precision",
@@ -62,7 +62,7 @@ HUGGINGFACE_BUILTIN_METRICS = Literal[
 HUGGINGFACE_FASTREPL_METRICS = Literal["mean_reciprocal_rank", "mean_average_precision"]
 
 
-class HuggingfaceMetric(BaseMetric):
+class HuggingfaceMetric(BaseMetricEval):
     __slots__ = ("name", "module")
 
     def __init__(self, name: str) -> None:
