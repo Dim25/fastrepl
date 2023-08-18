@@ -3,6 +3,7 @@ from fastrepl.utils.env import loadenv, setenv, getenv
 from fastrepl.utils.iterator import pairwise
 from fastrepl.utils.data_structure import OrderedSet, HistoryDict
 from fastrepl.utils.graph import GraphInfo, build_graph
+from fastrepl.utils.decorator import ensure
 
 from rich import print as pprint
 
@@ -17,4 +18,5 @@ __all__ = [
     "pprint",
     "GraphInfo",
     "build_graph",
+    "ensure",
 ]

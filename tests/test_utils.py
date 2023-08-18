@@ -1,6 +1,6 @@
 import pytest
 
-from fastrepl.utils import HistoryDict
+from fastrepl.utils import HistoryDict, ensure
 
 
 class TestDataStructure:
@@ -36,3 +36,20 @@ class TestDataStructure:
         with pytest.raises(NotImplementedError):
             hd = HistoryDict[str](initial="initial")
             assert hd is not None
+
+
+class TestDecorator:
+    def test_ensure(self):
+        x = 0
+
+        @ensure(lambda: x == 0)
+        def fn1():
+            return True
+
+        @ensure(lambda: x != 0)
+        def fn2():
+            return True
+
+        assert fn1()
+        with pytest.raises(AssertionError):
+            assert fn2()
