@@ -39,6 +39,8 @@ omit = ["**/__init__.py"]
 
 [tool.coverage.report]
 exclude_also = [
+    "import *",
+    "@overload",
     "@abstractmethod",
     "def __repr__",
     "raise NotImplementedError",
