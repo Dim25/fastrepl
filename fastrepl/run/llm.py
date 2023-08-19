@@ -1,4 +1,5 @@
 from typing import Literal, List, Dict
+import functools
 
 import litellm
 from litellm import completion as litellm_completion
@@ -19,10 +20,55 @@ SUPPORTED_MODELS = Literal[  # pragma: no cover
 
 
 def completion(
-    model: SUPPORTED_MODELS,  # pragma: no cover
+    model: SUPPORTED_MODELS,
     messages: List[Dict[Literal["role", "content"], str]],
     temperature: float = 0,
+    logit_bias: Dict[int, int] = {},
+    max_tokens: int = 50,
 ):
-    return litellm_completion(
-        model, messages, temperature=temperature
-    )  # pragma: no cover
+    return litellm_completion(  # pragma: no cover
+        model,
+        messages,
+        temperature=temperature,
+        logit_bias=logit_bias,
+        max_tokens=max_tokens,
+    )
+
+
+from fastrepl.utils import getenv
+
+
+def tokenize(
+    model: SUPPORTED_MODELS,
+    text: str,
+) -> List[int]:
+    if model == "command-nightly":
+        import cohere
+
+        co = cohere.Client(getenv("COHERE_API_KEY", ""))
+        response = co.tokenize(text=text, model="command")
+        return response.tokens
+    elif model in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]:
+        import tiktoken
+
+        enc = tiktoken.get_encoding("cl100k_base")
+        return enc.encode(text)
+
+    # https://docs.ai21.com/reference/tokenize-ref
+    raise NotImplementedError(f"tokenize not implemented for {model!r}")
+
+
+@functools.lru_cache(maxsize=None)
+def logit_bias_for_classification(model: SUPPORTED_MODELS, keys: str) -> Dict[int, int]:
+    if len(keys) != len(set(keys)):
+        raise ValueError("choices must be unique")
+
+    COHERE_MAX = 10
+    OPENAI_MAX = 100
+
+    if model == "command-nightly":
+        return {tokenize(model, k)[0]: COHERE_MAX for k in keys}
+    elif model in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]:
+        return {tokenize(model, k)[0]: OPENAI_MAX for k in keys}
+
+    raise NotImplementedError(f"logit_bias not implemented for {model!r}")
