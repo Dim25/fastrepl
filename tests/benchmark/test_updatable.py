@@ -1,4 +1,5 @@
 from fastrepl.polish import Updatable
+from fastrepl.repl import REPL
 
 
 def fn_without_updatable():
@@ -14,4 +15,5 @@ def test_fn_without_updatable(benchmark):
 
 
 def test_fn_with_updatable(benchmark):
-    benchmark(fn_with_updatable)
+    with REPL():
+        benchmark(fn_with_updatable)

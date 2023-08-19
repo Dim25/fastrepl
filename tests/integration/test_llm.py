@@ -1,7 +1,6 @@
 import pytest
 
-from fastrepl.run.llm import tokenize
-from fastrepl.run import logit_bias_for_classification
+from fastrepl.run.llm import tokenize, logit_bias_for_classification
 
 
 class TestTokenize:
@@ -113,9 +112,9 @@ class TestLogitBias:
         actual = logit_bias_for_classification(model, choices)
         assert actual == expected
 
-    def test_ai21(self):
-        with pytest.raises(NotImplementedError):
-            logit_bias_for_classification("j2-ultra", "ABC")
+    @pytest.mark.parametrize("model", ["j2-ultra", "togethercomputer/llama-2-70b-chat"])
+    def test_empty(self, model):
+        assert logit_bias_for_classification(model, "") == {}
 
     def test_invalid(self):
         with pytest.raises(ValueError):

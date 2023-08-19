@@ -16,12 +16,14 @@ SUPPORTED_MODELS = Literal[  # pragma: no cover
     "j2-ultra",
     # https://docs.litellm.ai/docs/completion/supported#cohere-models
     "command-nightly",
+    # https://docs.litellm.ai/docs/completion/supported#together-ai-models
+    "togethercomputer/llama-2-70b-chat",
 ]
 
 
 def completion(
     model: SUPPORTED_MODELS,
-    messages: List[Dict[Literal["role", "content"], str]],
+    messages: List[Dict[str, str]],
     temperature: float = 0,
     logit_bias: Dict[int, int] = {},
     max_tokens: int = 50,
@@ -61,14 +63,13 @@ def tokenize(
 @functools.lru_cache(maxsize=None)
 def logit_bias_for_classification(model: SUPPORTED_MODELS, keys: str) -> Dict[int, int]:
     if len(keys) != len(set(keys)):
-        raise ValueError("choices must be unique")
-
-    COHERE_MAX = 10
-    OPENAI_MAX = 100
+        raise ValueError("all characters in keys must be unique")
 
     if model == "command-nightly":
+        COHERE_MAX = 10
         return {tokenize(model, k)[0]: COHERE_MAX for k in keys}
     elif model in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]:
+        OPENAI_MAX = 100
         return {tokenize(model, k)[0]: OPENAI_MAX for k in keys}
-
-    raise NotImplementedError(f"logit_bias not implemented for {model!r}")
+    else:
+        return {}
