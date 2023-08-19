@@ -8,13 +8,13 @@ from fastrepl.utils import (
     pairwise,
     OrderedSet,
 )
-from fastrepl.context import GlobalContext, LocalContext
+from fastrepl.context import AnalyzeContext, LocalContext
 
 
 class AnalyzeController:
     @staticmethod
     def next_run():
-        GlobalContext.next_run()
+        AnalyzeContext.next_run()
 
     @staticmethod
     def build_report():
@@ -39,14 +39,14 @@ class AnalyzeController:
             elif GRAPH >= 1:
                 return ctx.function
 
-        for run in GlobalContext.run_ctx_keys:
+        for run in AnalyzeContext.run_ctx_keys:
             for ctx, keys in run.items():
                 info["nodes"].append((_get_node_name(ctx), _get_node_label(ctx, keys)))
             for ctx_a, ctx_b in pairwise(run.keys()):
                 info["edges"].append((_get_node_name(ctx_a), _get_node_name(ctx_b)))
 
-        if GRAPH >= 3 or len(GlobalContext.run_ctx_keys) > 1:
-            for i, run in enumerate(GlobalContext.run_ctx_keys):
+        if GRAPH >= 3 or len(AnalyzeContext.run_ctx_keys) > 1:
+            for i, run in enumerate(AnalyzeContext.run_ctx_keys):
                 first_ctx = list(run.keys())[0]
                 info["nodes"].append((f"run_{i}", f"run_{i}"))
                 info["edges"].append((f"run_{i}", _get_node_name(first_ctx)))
@@ -65,4 +65,5 @@ class Analyze(ContextDecorator):
         return self.controller
 
     def __exit__(self, *args):
-        GlobalContext.reset_analyze()
+        AnalyzeContext.reset()
+        self.controller = None
