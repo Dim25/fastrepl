@@ -1,7 +1,6 @@
 import pytest
 
-from fastrepl.run.llm import tokenize
-from fastrepl.run import logit_bias_for_classification
+from fastrepl.run.llm import tokenize, logit_bias_for_classification
 
 
 class TestTokenize:

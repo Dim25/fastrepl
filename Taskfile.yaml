@@ -10,7 +10,7 @@ tasks:
   test: poetry run pytest -m "not todo" -n auto --benchmark-disable {{.CLI_ARGS}}
   test:ci: poetry run pytest -m "not todo" -n auto --benchmark-disable --cov=fastrepl --cov-report xml:cov.xml
   test:todo: poetry run pytest -m "todo" -n auto -v --benchmark-disable
-  test:bench: poetry run pytest --benchmark-only tests/test_benchmark.py
+  test:bench: poetry run pytest --benchmark-only tests/benchmark
   test:cov: poetry run pytest --benchmark-disable --cov=fastrepl --cov-report=term-missing -n auto {{.CLI_ARGS}}
 
   todo: rg "TODO" --hidden
@@ -29,6 +29,8 @@ tasks:
   add:doc: poetry add {{.CLI_ARGS}} --group doc
   sync: poetry lock --no-update && poetry install --sync
   
+  fix:setuptools: poetry run pip install --force-reinstall -U setuptools && poetry run pip install --force-reinstall -U pip
+
   pre-publish: rm -rf dist && poetry config pypi-token.pypi $PYPI_API_KEY && poetry publish --no-cache --build --dry-run
   publish: poetry publish
 
