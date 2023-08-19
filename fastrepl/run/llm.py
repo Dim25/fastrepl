@@ -3,6 +3,7 @@ from typing import Literal, List, Dict
 import litellm
 from litellm import completion as litellm_completion
 
+litellm.telemetry = False  # pragma: no cover
 litellm.caching_with_models = True  # pragma: no cover
 
 SUPPORTED_MODELS = Literal[  # pragma: no cover
