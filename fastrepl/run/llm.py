@@ -1,6 +1,9 @@
-from typing import Any, Literal  # pragma: no cover
-from litellm import completion as litellm_completion  # pragma: no cover
+from typing import Literal, List, Dict
 
+import litellm
+from litellm import completion as litellm_completion
+
+litellm.caching_with_models = True  # pragma: no cover
 
 SUPPORTED_MODELS = Literal[  # pragma: no cover
     # https://docs.litellm.ai/docs/completion/supported#openai-chat-completion-models
@@ -16,8 +19,8 @@ SUPPORTED_MODELS = Literal[  # pragma: no cover
 
 def completion(
     model: SUPPORTED_MODELS,  # pragma: no cover
-    messages: Any,
-    temperature: int = 1,
+    messages: List[Dict[Literal["role", "content"], str]],
+    temperature: float = 0,
 ):
     return litellm_completion(
         model, messages, temperature=temperature
