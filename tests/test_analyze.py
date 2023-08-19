@@ -41,7 +41,7 @@ class TestGraph:
                 assert len(info["nodes"]) == 2 + (1 if GRAPH >= 3 else 0)
                 assert len(info["edges"]) == 1 + (1 if GRAPH >= 3 else 0)
 
-    def test_multi_run_1(self):
+    def test_multi_run(self):
         def fn1():
             Updatable(key="key_1", value="value_1"),
             Updatable(key="key_2", value="value_2"),
@@ -58,3 +58,32 @@ class TestGraph:
                 info = controller.convert_graph(GRAPH=GRAPH)
                 assert len(info["nodes"]) == 4
                 assert len(info["edges"]) == 2
+
+    def test_multi_run_shared_node(self):
+        def fn1():
+            Updatable(key="key_1", value="value_1"),
+
+        def fn2():
+            Updatable(key="key_2", value="value_2"),
+
+        def fn3():
+            Updatable(key="key_3", value="value_3"),
+
+        def pipeline1():
+            fn1()
+            fn2()
+
+        def pipeline2():
+            fn1()
+            fn3()
+
+        for GRAPH in [1, 2, 3]:
+            with Analyze() as controller:
+                pipeline1()
+                controller.next_run()
+                pipeline2()
+
+                info = controller.convert_graph(GRAPH=GRAPH)
+                assert len(info["nodes"]) == 6
+                assert len(set(info["nodes"])) == 5
+                assert len(info["edges"]) == 4
