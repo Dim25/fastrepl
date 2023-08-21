@@ -75,6 +75,7 @@ class HuggingfaceMetric(BaseMetricEval, Generic[Predictions, References]):
             "exact_match",
             "f1",
             "recall",
+            "precision",
             "accuracy",
             "matthews_correlation",
         ]

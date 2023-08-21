@@ -49,6 +49,13 @@ class TestHuggingfaceMetric:
                     references=[0, 0, 1, 1, 1],
                 )
                 assert result[name] == pytest.approx(0.66, abs=1e-2)
+            if name == "precision":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/precision/precision.py#L56
+                result = m.compute(
+                    predictions=[0, 1, 0, 1, 1],
+                    references=[0, 0, 1, 1, 1],
+                )
+                assert result[name] == pytest.approx(0.66, abs=1e-2)
 
             if name == "accuracy":
                 # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/accuracy/accuracy.py#L49
@@ -67,6 +74,90 @@ class TestHuggingfaceMetric:
                 assert result[name] == pytest.approx(0.54, abs=1e-2)
         except NotImplementedError:
             pass
+
+    def test_kwargs_average(self):
+        # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/f1/f1.py#L66
+        result = load_metric("f1").compute(
+            predictions=[0, 2, 1, 0, 0, 1],
+            references=[0, 1, 2, 0, 1, 2],
+            average="macro",
+        )
+        assert result["f1"] == pytest.approx(0.26, abs=1e-2)
+
+        result = load_metric("f1").compute(
+            predictions=[0, 2, 1, 0, 0, 1],
+            references=[0, 1, 2, 0, 1, 2],
+            average="micro",
+        )
+        assert result["f1"] == pytest.approx(0.33, abs=1e-2)
+
+        # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/precision/precision.py#L72
+        result = load_metric("precision").compute(
+            predictions=[0, 2, 1, 0, 0, 1],
+            references=[0, 1, 2, 0, 1, 2],
+            average="macro",
+        )
+        assert result["precision"] == pytest.approx(0.22, abs=1e-2)
+
+        result = load_metric("precision").compute(
+            predictions=[0, 2, 1, 0, 0, 1],
+            references=[0, 1, 2, 0, 1, 2],
+            average="micro",
+        )
+        assert result["precision"] == pytest.approx(0.33, abs=1e-2)
+
+    def test_compare_sklearn_multi_label(self):
+        import sklearn.metrics
+
+        predictions = [0, 2, 1, 0, 0, 1]
+        references = [0, 1, 2, 0, 1, 2]
+
+        result = sklearn.metrics.classification_report(
+            predictions,
+            references,
+            output_dict=True,
+        )
+
+        assert result["accuracy"] == pytest.approx(0.33, abs=1e-2)
+
+        assert result["0"]["f1-score"] == pytest.approx(0.8)
+        assert result["1"]["f1-score"] == pytest.approx(0.0)
+        assert result["2"]["f1-score"] == pytest.approx(0.0)
+        assert result["macro avg"]["f1-score"] == pytest.approx(0.26, abs=1e-2)
+        assert result["weighted avg"]["f1-score"] == pytest.approx(0.4)
+
+        assert result["0"]["precision"] == pytest.approx(1.0)
+        assert result["1"]["precision"] == pytest.approx(0.0)
+        assert result["2"]["precision"] == pytest.approx(0.0)
+        assert result["macro avg"]["precision"] == pytest.approx(0.33, abs=1e-2)
+        assert result["weighted avg"]["precision"] == pytest.approx(0.5)
+
+        assert result["0"]["recall"] == pytest.approx(0.66, abs=1e-2)
+        assert result["1"]["recall"] == pytest.approx(0.0)
+        assert result["2"]["recall"] == pytest.approx(0.0)
+        assert result["macro avg"]["recall"] == pytest.approx(0.22, abs=1e-2)
+        assert result["weighted avg"]["recall"] == pytest.approx(0.33, abs=1e-2)
+
+        assert result["0"]["support"] == pytest.approx(3.0)
+        assert result["1"]["support"] == pytest.approx(2.0)
+        assert result["2"]["support"] == pytest.approx(1.0)
+        assert result["macro avg"]["support"] == pytest.approx(6.0)
+        assert result["weighted avg"]["support"] == pytest.approx(6.0)
+        assert result["accuracy"] == pytest.approx(0.33, abs=1e-2)
+
+        # fmt: off
+        assert result["accuracy"] == pytest.approx(load_metric("accuracy").compute(predictions, references)["accuracy"], abs=1e-2)
+        assert result["macro avg"]["f1-score"] == pytest.approx(load_metric("f1").compute(predictions, references, average="macro")["f1"], abs=1e-2)
+
+        # TODO: These should pass
+        # assert result["macro avg"]["precision"] == pytest.approx(load_metric("precision").compute(predictions, references, average="macro")["precision"], abs=1e-2)
+        # assert result["macro avg"]["recall"] == pytest.approx(load_metric("recall").compute(predictions, references, average="macro")["recall"], abs=1e-2)
+        # assert result["weighted avg"]["f1-score"] == pytest.approx(load_metric("f1").compute(predictions, references, average="weighted")["f1"], abs=1e-2)
+        # assert result["weighted avg"]["precision"] == pytest.approx(load_metric("precision").compute(predictions, references, average="weighted")["precision"], abs=1e-2)
+        # assert result["weighted avg"]["recall"] == pytest.approx(load_metric("recall").compute(predictions, references, average="weighted")["recall"], abs=1e-2)
+
+        # TODO: Get per-class metric
+        # fmt: on
 
 
 class TestSemanticAnswerSimilarityMetric:
