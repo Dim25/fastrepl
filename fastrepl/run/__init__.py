@@ -1,7 +1,8 @@
-from fastrepl.run.llm import completion, SUPPORTED_MODELS
+from fastrepl.run.llm import completion, tokenize, SUPPORTED_MODELS
 
 __all__ = [
     "completion",
-    "logit_bias_for_classification",
+    "tokenize",
+    "logit_bias_from_labels",
     "SUPPORTED_MODELS",
 ]
