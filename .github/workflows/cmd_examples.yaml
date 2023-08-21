@@ -7,7 +7,7 @@ on:
 jobs:
   handle_comment_examples:
     name: Deploy
-    if: ${{ github.event.issue.pull_request && github.event.comment.user.login == "yujonglee" && contains(github.event.comment.body, '/examples') }}
+    if: ${{ github.event.issue.pull_request && github.event.comment.user.login == 'yujonglee' && contains(github.event.comment.body, '/examples') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
