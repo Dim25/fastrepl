@@ -31,6 +31,9 @@ jobs:
       - name: Install Task
         uses: arduino/setup-task@v1
 
+      - name: Check TODO
+        run: task todo:ci
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
