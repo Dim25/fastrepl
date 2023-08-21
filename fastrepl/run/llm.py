@@ -26,7 +26,7 @@ def completion(
     messages: List[Dict[str, str]],
     temperature: float = 0,
     logit_bias: Dict[int, int] = {},
-    max_tokens: int = 50,
+    max_tokens: int = 100,
 ):
     return litellm_completion(  # pragma: no cover
         model,
