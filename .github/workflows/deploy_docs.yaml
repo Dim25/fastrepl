@@ -1,13 +1,16 @@
-name: Preview Docs
+name: Deploy Docs
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["docs/**"]
   pull_request:
-    paths:
-      - "docs/**"
+    paths: ["docs/**"]
 
 jobs:
-  preview_docs:
+  preview:
+    if: github.event_name == 'pull_request'
     permissions: write-all
 
     strategy:
@@ -79,3 +82,51 @@ jobs:
               repo: context.repo.repo,
               body: body
             })
+  production:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version:
+          - "3.11"
+        poetry-version:
+          - "1.5.1"
+          
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Task
+        uses: arduino/setup-task@v1
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install poetry ${{ matrix.poetry-version }}
+        run: |
+          python -m ensurepip
+          python -m pip install --upgrade pip
+          python -m pip install poetry==${{ matrix.poetry-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m ensurepip
+          task doc:install
+
+      - name: Build Docs
+        run: |
+          task doc:build
+      
+      - name: Publish to Cloudflare Pages
+        id: publish
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: 3db5267cdeb5f79263ede3ec58090fe0
+          projectName: fastrepl
+          directory: docs/_build/html
+          branch: main
+          wranglerVersion: '3'
