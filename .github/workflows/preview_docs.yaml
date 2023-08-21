@@ -8,6 +8,8 @@ on:
 
 jobs:
   preview_docs:
+    permissions: write-all
+
     strategy:
       fail-fast: true
       matrix:
@@ -54,10 +56,26 @@ jobs:
           branch: preview
           wranglerVersion: '3'
 
-      - name: Poll for deployment status
-        run: |
-          until $(curl --output /dev/null -s -I -f ${{  steps.publish.outputs.url }}); do
-            printf '.'
-            sleep 2
-          done
-          echo "🚀 Deployed to ${{ steps.publish.outputs.url }} 🚀"
+      # - name: Poll for deployment status
+      #   run: |
+      #     until $(curl --output /dev/null -s -I -f ${{  steps.publish.outputs.url }}); do
+      #       printf '.'
+      #       sleep 2
+      #     done
+      #     echo "🚀 Deployed to ${{ steps.publish.outputs.url }} 🚀"
+
+      - name: Add comment to PR
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const success = '${{ job.status }}' === 'success';
+            const body = `${success ? '🚀 Preview deployed: ${{ steps.publish.outputs.url }}' : 'Failed to deploy preview ❌\n\n${url}'}`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
