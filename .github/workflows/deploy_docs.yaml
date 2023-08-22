@@ -8,9 +8,6 @@ on:
   pull_request:
     paths: ["docs/**"]
 
-permissions:
-  issues: write
-
 jobs:
   preview:
     if: github.event_name == 'pull_request'
@@ -87,7 +84,8 @@ jobs:
             })
   production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
+    permissions: write-all
+    
     strategy:
       fail-fast: true
       matrix:
