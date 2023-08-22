@@ -72,6 +72,23 @@ class TestHuggingfaceMetric:
                     references=[1, 3, 2, 0, 3, 2],
                 )
                 assert result[name] == pytest.approx(0.54, abs=1e-2)
+
+            if name == "mse":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/mse/mse.py#L69
+                result = m.compute(
+                    predictions=[2.5, 0.0, 2, 8],
+                    references=[3, -0.5, 2, 7],
+                )
+                assert result[name] == pytest.approx(0.375)
+
+            if name == "mae":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/mae/mae.py#L68
+                result = m.compute(
+                    predictions=[2.5, 0.0, 2, 8],
+                    references=[3, -0.5, 2, 7],
+                )
+                assert result[name] == pytest.approx(0.5)
+
         except NotImplementedError:
             pass
 

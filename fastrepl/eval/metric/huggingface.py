@@ -78,6 +78,8 @@ class HuggingfaceMetric(BaseMetricEval, Generic[Predictions, References]):
             "precision",
             "accuracy",
             "matthews_correlation",
+            "mse",
+            "mae",
         ]
 
         if name in get_args(HUGGINGFACE_FASTREPL_METRICS):
@@ -93,6 +95,8 @@ class HuggingfaceMetric(BaseMetricEval, Generic[Predictions, References]):
             self.module = evaluate.load(name)
 
     def compute(self, predictions: Predictions, references: References, **kwargs):
-        return self.module.compute(
+        result = self.module.compute(
             predictions=predictions, references=references, **kwargs
         )
+        # Huggingface has some inconsistencies in their API. Fix here if needed.
+        return result
