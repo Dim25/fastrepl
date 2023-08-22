@@ -11,13 +11,15 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
-version = "0.0.1"
+import importlib.metadata
+
+version = importlib.metadata.version("fastrepl")
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 
-project = "FastREPL"
+project = "♾️ FastREPL"
 copyright = "2023, yujonglee"
 author = "yujonglee"
 
