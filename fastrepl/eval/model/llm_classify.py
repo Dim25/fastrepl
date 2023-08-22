@@ -3,7 +3,11 @@ from typing import Tuple, Dict, List
 
 from fastrepl.run import completion, SUPPORTED_MODELS
 from fastrepl.eval.model.base import BaseModelEval
-from fastrepl.eval.model.utils import render_labels, logit_bias_from_labels
+from fastrepl.eval.model.utils import (
+    render_labels,
+    logit_bias_from_labels,
+    mapping_from_labels,
+)
 
 LLM_CLASSIFIER_SYSTEM_TPL = """You are master of classification who can classify any text according to the user's instructions.
 {context}
@@ -27,9 +31,7 @@ class LLMClassifier(BaseModelEval):
         references: List[Tuple[str, str]] = [],
     ) -> None:
         self.model = model
-        self.mapping = {
-            chr(ord("A") + i): label for i, label in enumerate(labels.keys())
-        }
+        self.mapping = mapping_from_labels(labels)
         self.rg = rg
         self.references = references
         self.system_msg = {

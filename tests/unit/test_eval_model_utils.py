@@ -4,6 +4,7 @@ import random
 from fastrepl.eval.model.utils import (
     logit_bias_from_labels,
     render_labels,
+    mapping_from_labels,
 )
 
 
@@ -93,3 +94,19 @@ A: Given text meets the criteria.
 C: Given text is not even related to the criteria.
 """.strip()
     )
+
+
+def test_mapping_from_labels():
+    mapping = mapping_from_labels(
+        labels={
+            "POSITIVE": "Given text is positive.",
+            "NEGATIVE": "Given text is negative.",
+            "NEUTRAL": "Given text is neutral.",
+        },
+        start=ord("A"),
+    )
+    assert mapping == {
+        "A": "POSITIVE",
+        "B": "NEGATIVE",
+        "C": "NEUTRAL",
+    }

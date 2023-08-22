@@ -3,7 +3,7 @@ from typing import Tuple, Dict, List
 
 from fastrepl.run import completion, SUPPORTED_MODELS
 from fastrepl.eval.model.base import BaseModelEval
-from fastrepl.eval.model.utils import render_labels
+from fastrepl.eval.model.utils import render_labels, mapping_from_labels
 
 LLM_COT_CLASSIFY_SYSTEM_TPL = """You are master of classification who can classify any text according to the user's instructions.
 If user gave you the text, do step by step thinking first, and classify it.
@@ -32,9 +32,7 @@ class LLMChainOfThoughtClassifier(BaseModelEval):
         references: List[Tuple[str, str]] = [],
     ) -> None:
         self.model = model
-        self.mapping = {
-            chr(ord("A") + i): label for i, label in enumerate(labels.keys())
-        }
+        self.mapping = mapping_from_labels(labels)
         self.references = references
         self.rg = rg
         self.system_msg = {

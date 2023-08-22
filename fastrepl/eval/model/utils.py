@@ -26,3 +26,8 @@ def render_labels(mapping: Dict[str, str], rg=random.Random(42)) -> str:
     rg.shuffle(options)
 
     return "\n".join(f"{k}: {v}" for k, v in options)
+
+
+def mapping_from_labels(labels: Dict[str, str], start=ord("A")) -> Dict[str, str]:
+    keys = labels.keys()
+    return {chr(start + i): label for i, label in enumerate(keys)}
