@@ -5,6 +5,17 @@ from fastrepl.run import completion, SUPPORTED_MODELS
 from fastrepl.eval.model.base import BaseModelEval
 from fastrepl.eval.model.utils import render_labels
 
+LLM_COT_SYSTEM_TPL = """If user gave you the text, do step by step thinking that is needed to classify it.
+Use less than 50 words.
+
+These are the labels that will be used later to classify the text:
+{labels}
+
+When do step-by-step thinking, you must consider the following:
+{context}
+
+### Thoghts:"""
+
 
 class LLMChainOfThought(BaseModelEval):
     __slots__ = ("model", "references", "rg", "system_msg")
@@ -22,16 +33,10 @@ class LLMChainOfThought(BaseModelEval):
         self.rg = rg
         self.system_msg = {
             "role": "system",
-            "content": f"""If user gave you the text, do step by step thinking that is needed to classify it.
-Use less than 50 words.
-
-These are the labels that will be used later to classify the text:
-{render_labels(labels)}
-
-When do step-by-step thinking, you must consider the following:
-{context}
-
-### Thoghts:""",
+            "content": LLM_COT_SYSTEM_TPL.format(
+                context=context,
+                labels=render_labels(labels),
+            ),
         }
 
     def compute(self, sample: str, context="") -> str:

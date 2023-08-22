@@ -5,9 +5,18 @@ from fastrepl.run import completion, SUPPORTED_MODELS
 from fastrepl.eval.model.base import BaseModelEval
 from fastrepl.eval.model.utils import render_labels, logit_bias_from_labels
 
+LLM_CLASSIFIER_SYSTEM_TPL = """You are master of classification who can classify any text according to the user's instructions.
+{context}
+
+These are the labels you can use:
+{labels}
+
+Only output one of these label keys:
+{label_keys}"""
+
 
 class LLMClassifier(BaseModelEval):
-    __slots__ = ("labels", "model", "rg", "references", "system_msg")
+    __slots__ = ("model", "mapping", "rg", "references", "system_msg")
 
     def __init__(
         self,
@@ -17,21 +26,19 @@ class LLMClassifier(BaseModelEval):
         rg=random.Random(42),
         references: List[Tuple[str, str]] = [],
     ) -> None:
-        self.labels = labels
         self.model = model
+        self.mapping = {
+            chr(ord("A") + i): label for i, label in enumerate(labels.keys())
+        }
         self.rg = rg
         self.references = references
-
         self.system_msg = {
             "role": "system",
-            "content": f"""You are master of classification who can classify any text according to the user's instructions.
-{context}
-
-These are the labels you can use:
-{render_labels(self.labels)}
-
-Only output one of these label keys:
-{self.labels.keys()}""",
+            "content": LLM_CLASSIFIER_SYSTEM_TPL.format(
+                context=context,
+                labels=render_labels(self.mapping),
+                label_keys=self.mapping.keys(),
+            ),
         }
 
     def compute(self, sample: str, context="") -> str:
@@ -54,10 +61,10 @@ Only output one of these label keys:
                 max_tokens=1,  #  NOTE: when using logit_bias for classification, max_tokens should be 1
                 logit_bias=logit_bias_from_labels(
                     self.model,
-                    set(self.labels.keys()),
+                    set(self.mapping.keys()),
                 ),
             )
             .choices[0]
             .message.content
         )
-        return self.labels.get(result, "UNKNOWN")
+        return self.mapping.get(result, "UNKNOWN")
