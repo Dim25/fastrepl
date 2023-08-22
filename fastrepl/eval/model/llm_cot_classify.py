@@ -31,8 +31,11 @@ If user gave you the text, do step by step thinking first, and classify it.
 When do step-by-step thinking(less than 30 words), you must consider the following:
 {context}
 
-For classification, use the following labels(<LABEL>:<DESCRIPTION>):
+These are the labels you can use:
 {render_labels(self.labels)}
+
+For classification, only output one of these label keys:
+{self.labels.keys()}
 
 When responding, strictly follow this format: ### Thoghts: <STEP_BY_STEP_THOUGHTS>\n### Label: <LABEL>""",
         }

@@ -27,10 +27,11 @@ class LLMClassifier(BaseModelEval):
             "content": f"""You are master of classification who can classify any text according to the user's instructions.
 {context}
 
-Use only these labels:
-{render_labels(self.labels)}.
+These are the labels you can use:
+{render_labels(self.labels)}
 
-Output only one of the given labels.""",
+Only output one of these label keys:
+{self.labels.keys()}""",
         }
 
     def compute(self, sample: str, context="") -> str:
