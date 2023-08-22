@@ -1,3 +1,5 @@
-from runner import ClassificationRunner
+from fastrepl.loop.evaluator import Evaluator
 
-__all__ = ["ClassificationRunner"]
+__all__ = [
+    "Evaluator",
+]
