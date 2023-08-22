@@ -11,6 +11,7 @@ class TestEvaluator:
 
         with pytest.raises(ValueError):
             Evaluator(
+                input_feature="b",
                 dataset=ds,
                 evals=[],
             )
@@ -18,6 +19,8 @@ class TestEvaluator:
     def test_features(self):
         input_ds = Dataset.from_dict({"input": [1]})
         output_ds = Evaluator(
+            input_feature="input",
+            prediction_feature="output",
             dataset=input_ds,
             evals=[],
         ).run()
@@ -35,6 +38,8 @@ class TestEvaluator:
         output_ds = Evaluator(
             dataset=input_ds,
             evals=[MockEval(), MockEval()],
+            input_feature="input",
+            prediction_feature="output",
         ).run()
 
         assert output_ds["output"] == ["1010"]
@@ -48,6 +53,23 @@ class TestEvaluator:
         output_ds = Evaluator(
             dataset=input_ds,
             evals=[MockEval(), MockEval()],
+            input_feature="input",
+            prediction_feature="output",
         ).run()
 
         assert output_ds["output"] == ["1010", "2020", "3030"]
+
+    def test_eval_pipe_multiple_with_context(self):
+        class MockEval(BaseModelEval):
+            def compute(self, sample: str, context="") -> str:
+                return context + sample + "0"
+
+        input_ds = Dataset.from_dict({"input": ["1", "2", "3"]})
+        output_ds = Evaluator(
+            dataset=input_ds,
+            evals=[MockEval(), MockEval()],
+            input_feature="input",
+            prediction_feature="output",
+        ).run(context="!")
+
+        assert output_ds["output"] == ["!1010", "!2020", "!3030"]
