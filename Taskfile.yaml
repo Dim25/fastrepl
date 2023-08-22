@@ -39,3 +39,4 @@ tasks:
   doc:install: poetry run pip install -r docs/requirements.txt
   doc:build: rm -rf docs/_build && poetry run sphinx-build -b html docs docs/_build/html
   doc:watch: rm -rf docs/_build && poetry run sphinx-autobuild docs/ docs/_build/html --open-browser --watch $(git rev-parse --show-toplevel)/fastrepl/
+  doc:deploy: npx wrangler pages deploy docs/_build/html --commit-dirty --project-name fastrepl --branch main
