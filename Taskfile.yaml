@@ -1,7 +1,7 @@
 version: '3'
 
 tasks:
-  install: POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
+  install: POETRY_VIRTUALENVS_IN_PROJECT=true poetry install --no-cache --no-interaction
   
   run: poetry run python3 {{.CLI_ARGS}}
   run:example:basic: poetry run jupyter nbconvert --to notebook --inplace --execute examples/basic.ipynb
@@ -31,6 +31,7 @@ tasks:
   add:doc: poetry add {{.CLI_ARGS}} --group doc
   sync: poetry lock --no-update && poetry install --sync
   
+  convert:nb2py: poetry run jupyter nbconvert --to python {{.CLI_ARGS}}
   fix:setuptools: poetry run pip install --force-reinstall -U setuptools && poetry run pip install --force-reinstall -U pip
 
   pre-publish: rm -rf dist && poetry config pypi-token.pypi $PYPI_API_KEY && poetry publish --no-cache --build --dry-run
