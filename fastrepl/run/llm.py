@@ -7,6 +7,9 @@ from litellm import completion as litellm_completion
 litellm.telemetry = False  # pragma: no cover
 litellm.caching_with_models = True  # pragma: no cover
 
+import backoff
+from fastrepl.run.error import check_retryable_and_log, RetryableException
+
 SUPPORTED_MODELS = Literal[  # pragma: no cover
     # https://docs.litellm.ai/docs/completion/supported#openai-chat-completion-models
     "gpt-3.5-turbo",
@@ -21,6 +24,12 @@ SUPPORTED_MODELS = Literal[  # pragma: no cover
 ]
 
 
+@backoff.on_exception(
+    wait_gen=backoff.expo,
+    exception=(RetryableException),
+    max_value=60,
+    factor=1.5,
+)
 def completion(
     model: SUPPORTED_MODELS,
     messages: List[Dict[str, str]],
@@ -28,13 +37,21 @@ def completion(
     logit_bias: Dict[int, int] = {},
     max_tokens: int = 100,
 ):
-    return litellm_completion(  # pragma: no cover
-        model,
-        messages,
-        temperature=temperature,
-        logit_bias=logit_bias,
-        max_tokens=max_tokens,
-    )
+    try:
+        result = litellm_completion(  # pragma: no cover
+            model,
+            messages,
+            temperature=temperature,
+            logit_bias=logit_bias,
+            max_tokens=max_tokens,
+            force_timeout=30,
+        )
+        return result
+    except Exception as e:
+        if check_retryable_and_log(e):
+            raise RetryableException() from e
+        else:
+            raise e
 
 
 from fastrepl.utils import getenv
