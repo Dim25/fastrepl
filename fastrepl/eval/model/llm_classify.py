@@ -56,17 +56,14 @@ class LLMClassifier(BaseModelEval):
             {"role": "user", "content": f"{additional_info}Text to classify: {sample}"}
         )
 
-        result = (
-            completion(
+        result = completion(
+            self.model,
+            messages=messages,
+            max_tokens=1,  #  NOTE: when using logit_bias for classification, max_tokens should be 1
+            logit_bias=logit_bias_from_labels(
                 self.model,
-                messages=messages,
-                max_tokens=1,  #  NOTE: when using logit_bias for classification, max_tokens should be 1
-                logit_bias=logit_bias_from_labels(
-                    self.model,
-                    set(self.mapping.keys()),
-                ),
-            )
-            .choices[0]
-            .message.content
-        )
+                set(self.mapping.keys()),
+            ),
+        )["choices"][0]["message"]["content"]
+
         return self.mapping.get(result, "UNKNOWN")

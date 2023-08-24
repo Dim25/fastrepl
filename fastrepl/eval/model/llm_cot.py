@@ -54,6 +54,11 @@ class LLMChainOfThought(BaseModelEval):
                 "content": f"{additional_info}Text to think about: {sample}",
             }
         )
+        # fmt: off
+        result = completion(
+            model=self.model,
+            messages=messages, 
+        )["choices"][0]["message"]["content"]
+        # fmt: on
 
-        result = completion(self.model, messages=messages).choices[0].message.content
         return result

@@ -23,6 +23,7 @@ transformers = "^4.31.0"
 torch = ">=2.0.0, !=2.0.1"
 datasets = "^2.14.4"
 backoff = "^2.2.1"
+sqlalchemy = "^2.0.20"
 
 textual = { version = "^0.32.0", optional = true }
 

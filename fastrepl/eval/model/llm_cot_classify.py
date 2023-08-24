@@ -56,6 +56,11 @@ class LLMChainOfThoughtClassifier(BaseModelEval):
         messages.append(
             {"role": "user", "content": f"{additional_info}Text to classify: {sample}"}
         )
+        # fmt: off
+        result = completion(
+            model=self.model,
+            messages=messages, 
+        )["choices"][0]["message"]["content"]
+        # fmt: on
 
-        result = completion(self.model, messages=messages).choices[0].message.content
         return self.mapping.get(result[-1], "UNKNOWN")
