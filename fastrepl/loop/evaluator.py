@@ -54,6 +54,6 @@ class Evaluator:
             with ThreadPool(NUM_THREADS) as pool:
                 for result in pool.imap(self._run_evals, inputs):
                     results.append(result)
-                    progress.update(task, advance=1)
+                    progress.update(task, advance=1, refresh=True)
 
         return self.dataset.add_column(self.prediction_feature, results)
