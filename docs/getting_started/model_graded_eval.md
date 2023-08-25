@@ -10,3 +10,7 @@ See `Figure 2: Human Evaluation Scores` in [Large language models on wikipedia-s
 
 ## TODO
 [Style Over Substance: Evaluation Biases for Large Language Models](https://arxiv.org/abs/2307.03025)
+
+
+Reference:
+- https://eugeneyan.com/writing/llm-patterns/#evals-to-measure-performance
