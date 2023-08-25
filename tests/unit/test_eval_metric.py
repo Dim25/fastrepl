@@ -88,7 +88,30 @@ class TestHuggingfaceMetric:
                     references=[3, -0.5, 2, 7],
                 )
                 assert result[name] == pytest.approx(0.5)
+            if name == "rouge":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/rouge/rouge.py#L79
+                result = m.compute(
+                    predictions=["hello there", "general kenobi"],
+                    references=["hello there", "general kenobi"],
+                )
+                assert len(result) == 4
+                assert result["rouge1"] == pytest.approx(1.0)
+                assert result["rouge2"] == pytest.approx(1.0)
+                assert result["rougeL"] == pytest.approx(1.0)
+                assert result["rougeLsum"] == pytest.approx(1.0)
+            if name == "bleu":
+                # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/bleu/bleu.py#L83
+                result = m.compute(
+                    predictions=["hello there general kenobi", "foo bar foobar"],
+                    references=[
+                        ["hello there general kenobi", "hello there!"],
+                        ["foo bar foobar"],
+                    ],
+                )
+                assert result[name] == pytest.approx(1.0)
 
+        except ImportError as e:
+            pytest.skip(f"Skipping {name} because: {e}")
         except NotImplementedError:
             pass
 

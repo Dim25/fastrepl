@@ -80,6 +80,8 @@ class HuggingfaceMetric(BaseMetricEval, Generic[Predictions, References]):
             "matthews_correlation",
             "mse",
             "mae",
+            "rouge",
+            "bleu",
         ]
 
         if name in get_args(HUGGINGFACE_FASTREPL_METRICS):
