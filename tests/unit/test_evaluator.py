@@ -13,7 +13,7 @@ class TestEvaluator:
             Evaluator(
                 input_feature="b",
                 dataset=ds,
-                evals=[],
+                pipeline=[],
             )
 
     def test_features(self):
@@ -22,7 +22,7 @@ class TestEvaluator:
             input_feature="input",
             prediction_feature="output",
             dataset=input_ds,
-            evals=[],
+            pipeline=[],
         ).run()
 
         assert len(output_ds.features) == 2
@@ -37,7 +37,7 @@ class TestEvaluator:
         input_ds = Dataset.from_dict({"input": ["1"]})
         output_ds = Evaluator(
             dataset=input_ds,
-            evals=[MockEval(), MockEval()],
+            pipeline=[MockEval(), MockEval()],
             input_feature="input",
             prediction_feature="output",
         ).run()
@@ -52,7 +52,7 @@ class TestEvaluator:
         input_ds = Dataset.from_dict({"input": ["1", "2", "3"]})
         output_ds = Evaluator(
             dataset=input_ds,
-            evals=[MockEval(), MockEval()],
+            pipeline=[MockEval(), MockEval()],
             input_feature="input",
             prediction_feature="output",
         ).run()
@@ -67,7 +67,7 @@ class TestEvaluator:
         input_ds = Dataset.from_dict({"input": ["1", "2", "3"]})
         output_ds = Evaluator(
             dataset=input_ds,
-            evals=[MockEval(), MockEval()],
+            pipeline=[MockEval(), MockEval()],
             input_feature="input",
             prediction_feature="output",
         ).run(context="!")

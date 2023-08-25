@@ -14,7 +14,7 @@ NUM_THREADS = getenv("NUM_THREADS", 8)
 class Evaluator:
     __slots__ = [
         "dataset",
-        "evals",
+        "pipeline",
         "input_feature",
         "prediction_feature",
         "initial_context",
@@ -23,7 +23,7 @@ class Evaluator:
     def __init__(
         self,
         dataset: Dataset,
-        evals: List[BaseModelEval],
+        pipeline: List[BaseModelEval],
         input_feature: str = "input",
         prediction_feature: str = "prediction",
     ) -> None:
@@ -31,14 +31,14 @@ class Evaluator:
             raise ValueError(f"input feature {input_feature!r} not in dataset")
 
         self.dataset = dataset
-        self.evals = evals
+        self.pipeline = pipeline
         self.input_feature = input_feature
         self.prediction_feature = prediction_feature
 
     def _run_evals(self, input: str) -> str:
         return functools.reduce(
             lambda previous, eval: eval.compute(input, previous),
-            self.evals,
+            self.pipeline,
             self.initial_context,
         )
 
