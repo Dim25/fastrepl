@@ -1,5 +1,5 @@
 from fastrepl.polish import Updatable
-from fastrepl.repl import REPL
+from fastrepl.loop import REPL
 
 
 def fn_without_updatable():

@@ -1,4 +1,5 @@
 from typing import Literal, List, Dict
+import json
 import functools
 
 import backoff
@@ -25,9 +26,6 @@ SUPPORTED_MODELS = Literal[  # pragma: no cover
     # https://docs.litellm.ai/docs/completion/supported#together-ai-models
     "togethercomputer/llama-2-70b-chat",
 ]
-
-from fastrepl.run.cache import SQLiteCache
-import json
 
 
 @backoff.on_exception(

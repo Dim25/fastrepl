@@ -1,6 +1,6 @@
 import pytest
 
-from fastrepl import Analyze
+from fastrepl.loop import Analyze
 from fastrepl.polish import Updatable
 
 # TODO: These tests work on my machine and have worked in CI before, but they suddenly start failing at #11. I'm not really sure why, but let's move on.

@@ -10,7 +10,8 @@ class LocalContext:
 
     def __init__(self, frame: FrameInfo) -> None:
         self._filename, self._function = (
-            # TODO: This can be problem if two files in different directory has same filename and Updatable.key
+            # TODO: We don't really need basename here.
+            # Actually, this can be problem if two files in different directory has same filename and Updatable.key
             os.path.basename(frame.filename),
             frame.function,
         )

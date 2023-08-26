@@ -4,6 +4,7 @@ from fastrepl.utils.iterator import pairwise
 from fastrepl.utils.data_structure import OrderedSet, HistoryDict
 from fastrepl.utils.graph import GraphInfo, build_graph
 from fastrepl.utils.decorator import ensure
+from fastrepl.utils.context import LocalContext
 
 from rich import print as pprint
 
@@ -19,4 +20,5 @@ __all__ = [
     "GraphInfo",
     "build_graph",
     "ensure",
+    "LocalContext",
 ]

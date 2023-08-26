@@ -1,6 +1,6 @@
 import pytest
 
-from fastrepl import REPL
+from fastrepl.loop import REPL
 from fastrepl.polish import Updatable
 
 

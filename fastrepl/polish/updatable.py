@@ -1,6 +1,8 @@
 import inspect
 
-from fastrepl.context import AnalyzeContext, REPLContext, LocalContext
+from fastrepl.loop import AnalyzeContext, REPLContext
+from fastrepl.utils import LocalContext
+
 
 DEFAULT_WHAT = "this is updatable value"
 DEFAULT_HOW = "be creative while maintaining the original meaning"
