@@ -66,3 +66,6 @@ tui = ["textual"]
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[project.entry-points.pytest11]
+pytest-fastrepl = "fastrepl.pytest_plugin"

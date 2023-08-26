@@ -8,7 +8,7 @@ tasks:
   run:example:all: poetry run jupyter nbconvert --to notebook --inplace --execute examples/*.ipynb
 
   test: poetry run pytest -m "not todo" -n auto --benchmark-disable {{.CLI_ARGS}}
-  test:ci: poetry run pytest -m "not todo" -n auto --benchmark-disable --cov=fastrepl --cov-report xml:cov.xml
+  test:ci: poetry run pytest -m "not todo" -n auto --benchmark-disable --cov=fastrepl --cov-report xml:cov.xml --ignore=tests/evaluation
   test:todo: poetry run pytest -m "todo" -n auto -v --benchmark-disable
   test:bench: poetry run pytest --benchmark-only tests/benchmark
   test:cov: poetry run pytest --benchmark-disable --cov=fastrepl --cov-report=term-missing -n auto {{.CLI_ARGS}}
