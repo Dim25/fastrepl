@@ -29,7 +29,7 @@ class LocalRunner(BaseRunner):
         self._input_feature = input_feature
         self._output_feature = output_feature
 
-    def run(self):
+    def run(self) -> Dataset:
         results = []
         with Progress() as progress:
             task = progress.add_task("[cyan]Processing...", total=len(self._dataset))
