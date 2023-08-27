@@ -42,6 +42,7 @@ No. **FastREPL** will help you to evaluate and polish your LLM based app.
    
    advanced_usage/eval_domain_shift.md
    advanced_usage/prompt_engineering.md
+   advanced_usage/human_eval.md
 
 .. toctree::
    :maxdepth: 1

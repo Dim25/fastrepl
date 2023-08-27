@@ -4,7 +4,7 @@ from typing import get_args
 from evaluate import list_evaluation_modules
 import numpy as np
 
-from fastrepl.eval.metric import load_metric
+import fastrepl
 from fastrepl.eval.metric.huggingface import (
     HUGGINGFACE_BUILTIN_METRICS,
     HUGGINGFACE_FASTREPL_METRICS,
@@ -26,7 +26,7 @@ class TestHuggingfaceMetric:
     )
     def test_metric(self, name):
         try:
-            m = load_metric(name)
+            m = fastrepl.load_metric(name)
             if name == "f1":
                 # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/f1/f1.py#L52
                 result = m.compute(
@@ -117,14 +117,14 @@ class TestHuggingfaceMetric:
 
     def test_kwargs_average(self):
         # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/f1/f1.py#L66
-        result = load_metric("f1").compute(
+        result = fastrepl.load_metric("f1").compute(
             predictions=[0, 2, 1, 0, 0, 1],
             references=[0, 1, 2, 0, 1, 2],
             average="macro",
         )
         assert result["f1"] == pytest.approx(0.26, abs=1e-2)
 
-        result = load_metric("f1").compute(
+        result = fastrepl.load_metric("f1").compute(
             predictions=[0, 2, 1, 0, 0, 1],
             references=[0, 1, 2, 0, 1, 2],
             average="micro",
@@ -132,14 +132,14 @@ class TestHuggingfaceMetric:
         assert result["f1"] == pytest.approx(0.33, abs=1e-2)
 
         # https://github.com/huggingface/evaluate/blob/af3c30561d840b83e54fc5f7150ea58046d6af69/metrics/precision/precision.py#L72
-        result = load_metric("precision").compute(
+        result = fastrepl.load_metric("precision").compute(
             predictions=[0, 2, 1, 0, 0, 1],
             references=[0, 1, 2, 0, 1, 2],
             average="macro",
         )
         assert result["precision"] == pytest.approx(0.22, abs=1e-2)
 
-        result = load_metric("precision").compute(
+        result = fastrepl.load_metric("precision").compute(
             predictions=[0, 2, 1, 0, 0, 1],
             references=[0, 1, 2, 0, 1, 2],
             average="micro",
@@ -186,15 +186,15 @@ class TestHuggingfaceMetric:
         assert result["accuracy"] == pytest.approx(0.33, abs=1e-2)
 
         # fmt: off
-        assert result["accuracy"] == pytest.approx(load_metric("accuracy").compute(predictions, references)["accuracy"], abs=1e-2)
-        assert result["macro avg"]["f1-score"] == pytest.approx(load_metric("f1").compute(predictions, references, average="macro")["f1"], abs=1e-2)
+        assert result["accuracy"] == pytest.approx(fastrepl.load_metric("accuracy").compute(predictions, references)["accuracy"], abs=1e-2)
+        assert result["macro avg"]["f1-score"] == pytest.approx(fastrepl.load_metric("f1").compute(predictions, references, average="macro")["f1"], abs=1e-2)
 
         # TODO: These should pass
-        # assert result["macro avg"]["precision"] == pytest.approx(load_metric("precision").compute(predictions, references, average="macro")["precision"], abs=1e-2)
-        # assert result["macro avg"]["recall"] == pytest.approx(load_metric("recall").compute(predictions, references, average="macro")["recall"], abs=1e-2)
-        # assert result["weighted avg"]["f1-score"] == pytest.approx(load_metric("f1").compute(predictions, references, average="weighted")["f1"], abs=1e-2)
-        # assert result["weighted avg"]["precision"] == pytest.approx(load_metric("precision").compute(predictions, references, average="weighted")["precision"], abs=1e-2)
-        # assert result["weighted avg"]["recall"] == pytest.approx(load_metric("recall").compute(predictions, references, average="weighted")["recall"], abs=1e-2)
+        # assert result["macro avg"]["precision"] == pytest.approx(fastrepl.load_metric("precision").compute(predictions, references, average="macro")["precision"], abs=1e-2)
+        # assert result["macro avg"]["recall"] == pytest.approx(fastrepl.load_metric("recall").compute(predictions, references, average="macro")["recall"], abs=1e-2)
+        # assert result["weighted avg"]["f1-score"] == pytest.approx(fastrepl.load_metric("f1").compute(predictions, references, average="weighted")["f1"], abs=1e-2)
+        # assert result["weighted avg"]["precision"] == pytest.approx(fastrepl.load_metric("precision").compute(predictions, references, average="weighted")["precision"], abs=1e-2)
+        # assert result["weighted avg"]["recall"] == pytest.approx(fastrepl.load_metric("recall").compute(predictions, references, average="weighted")["recall"], abs=1e-2)
 
         # TODO: Get per-class metric
         # fmt: on
@@ -240,7 +240,7 @@ class TestSemanticAnswerSimilarityMetric:
         ],
     )
     def test_cross_encoder(self, predictions, references, expected):
-        m = load_metric(
+        m = fastrepl.load_metric(
             "sas", model_name_or_path="cross-encoder/ms-marco-MiniLM-L-12-v2"
         )
         actual = m.compute(predictions=predictions, references=references)
@@ -287,7 +287,7 @@ class TestSemanticAnswerSimilarityMetric:
         ],
     )
     def test_bi_encoder(self, predictions, references, expected):
-        m = load_metric(
+        m = fastrepl.load_metric(
             "sas", model_name_or_path="sentence-transformers/all-MiniLM-L6-v2"
         )
         actual = m.compute(predictions=predictions, references=references)

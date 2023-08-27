@@ -1,8 +1,8 @@
 import pytest
 
 import fastrepl
-from fastrepl.run import tokenize, completion
-from fastrepl.run.cache import SQLiteCache
+from fastrepl.llm import tokenize, completion
+from fastrepl.cache import SQLiteCache
 
 
 class TestTokenize:
@@ -57,8 +57,8 @@ class TestTokenize:
 
 class TestCache:
     def test_mark(self):
-        fastrepl.cache = SQLiteCache()
-        fastrepl.cache.clear()
+        fastrepl.llm_cache = SQLiteCache()
+        fastrepl.llm_cache.clear()
 
         result_1 = completion(
             model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}]
@@ -73,15 +73,16 @@ class TestCache:
         assert result_1 == result_2
 
     def test_response(self):
-        fastrepl.cache = SQLiteCache()
-        fastrepl.cache.clear()
-        fastrepl.cache.update(
+        fastrepl.llm_cache = SQLiteCache()
+        fastrepl.llm_cache.clear()
+
+        fastrepl.llm_cache.update(
             "gpt-3.5-turbo",
             prompt='[{"role": "user", "content": "hello"}]',
             response='{"text": "hello"}',
         )
 
-        assert fastrepl.cache is not None
+        assert fastrepl.llm_cache is not None
 
         result = completion(
             model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}]

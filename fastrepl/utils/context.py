@@ -1,26 +1,18 @@
-import os
 from inspect import FrameInfo
 
 
 class LocalContext:
     __slots__ = ("_filename", "_function")
 
-    _filename: str
-    _function: str
-
     def __init__(self, frame: FrameInfo) -> None:
-        self._filename, self._function = (
-            # TODO: We don't really need basename here.
-            # Actually, this can be problem if two files in different directory has same filename and Updatable.key
-            os.path.basename(frame.filename),
-            frame.function,
-        )
+        self._filename = frame.filename
+        self._function = frame.function
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return f"{self._filename}:{self._function}"
 
-    def __repr__(self) -> str:
-        return f"VariableContext({self._filename!r}, {self._function!r})"
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"LocalContext({self._filename!r}, {self._function!r})"
 
     def __hash__(self) -> int:
         return hash((self._filename, self._function))

@@ -1,7 +1,7 @@
 import random
 from typing import Tuple, List, Dict
 
-from fastrepl.run import completion, SUPPORTED_MODELS
+from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.model.base import BaseModelEval
 from fastrepl.eval.model.utils import render_labels
 

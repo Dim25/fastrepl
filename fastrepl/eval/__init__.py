@@ -1,5 +1,5 @@
-from fastrepl.eval.evaluator import Evaluator
+from fastrepl.eval.metric import *
+from fastrepl.eval.model import *
+from fastrepl.eval.human import *
 
-__all__ = [
-    "Evaluator",
-]
+from fastrepl.eval.evaluator import *

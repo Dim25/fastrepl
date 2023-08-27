@@ -1,7 +1,7 @@
 import random
 from typing import Dict, Set
 
-from fastrepl.run import SUPPORTED_MODELS, tokenize
+from fastrepl.llm import SUPPORTED_MODELS, tokenize
 
 
 def logit_bias_from_labels(model: SUPPORTED_MODELS, labels: Set[str]) -> Dict[int, int]:

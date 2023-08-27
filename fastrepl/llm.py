@@ -3,6 +3,8 @@ import json
 import functools
 
 import backoff
+import openai.error
+
 import litellm
 from litellm import completion as litellm_completion, ModelResponse
 
@@ -11,8 +13,30 @@ litellm.caching = False  # pragma: no cover
 litellm.caching_with_models = False  # pragma: no cover
 
 import fastrepl
-from fastrepl.utils import getenv
-from fastrepl.run.error import check_retryable_and_log, RetryableException
+from fastrepl.utils import getenv, pprint
+
+
+# TODO: This logging should be added to some global context and rendered in Live display
+def check_retryable_and_log(exp: Exception) -> bool:
+    if isinstance(exp, openai.error.ServiceUnavailableError):
+        pprint("[bright_red]Service Unavailable[/bright_red]")
+    elif isinstance(exp, openai.error.APIError):
+        pprint("[bright_red]API Error[/bright_red]")
+    elif isinstance(exp, openai.error.RateLimitError):
+        pprint("[bright_red]Rate Limit Error[/bright_red]")
+    elif isinstance(exp, openai.error.APIConnectionError):
+        pprint("[bright_red]API Connection Error[/bright_red]")
+    elif isinstance(exp, openai.error.Timeout):
+        pprint("[bright_red]Timeout[/bright_red]")
+    else:
+        return False
+    return True
+
+
+class RetryableException(Exception):
+    def __init__(self):
+        super(Exception, self).__init__("retryable exception from fastrepl")
+
 
 SUPPORTED_MODELS = Literal[  # pragma: no cover
     # https://docs.litellm.ai/docs/completion/supported#openai-chat-completion-models
@@ -41,8 +65,8 @@ def completion(
     logit_bias: Dict[int, int] = {},
     max_tokens: int = 100,
 ) -> ModelResponse:
-    if fastrepl.cache is not None:
-        hit = fastrepl.cache.lookup(model, prompt=json.dumps(messages))
+    if fastrepl.llm_cache is not None:
+        hit = fastrepl.llm_cache.lookup(model, prompt=json.dumps(messages))
         if hit is not None:
             ret = json.loads(hit)
             ret["_fastrepl_cached"] = True
@@ -57,8 +81,8 @@ def completion(
             max_tokens=max_tokens,
             force_timeout=30,
         )
-        if fastrepl.cache is not None:
-            fastrepl.cache.update(
+        if fastrepl.llm_cache is not None:
+            fastrepl.llm_cache.update(
                 model, prompt=json.dumps(messages), response=json.dumps(result)
             )
         return result

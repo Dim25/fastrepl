@@ -9,7 +9,7 @@ try:
 except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
 
-from fastrepl.run.cache.base import BaseCache
+from fastrepl.cache.base import BaseCache
 
 Base = declarative_base()
 

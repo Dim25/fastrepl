@@ -12,7 +12,9 @@ class GraphInfo(TypedDict):
 def build_graph(graph: GraphInfo) -> Digraph:  # pragma: no cover
     PLAIN_PREFIX = "run_"
 
-    dot = Digraph(name=graph["id"], format="png")
+    dot = Digraph(name=graph["id"], comment=graph["id"], format="png")
+    dot.attr(label=f'status: {graph["id"]}')
+
     for name, label in graph["nodes"]:
         shape = "plain" if str.startswith(name, PLAIN_PREFIX) else "ellipse"
         dot.node(name, label, shape=shape)

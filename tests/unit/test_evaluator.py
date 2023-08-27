@@ -1,14 +1,13 @@
 import pytest
-from datasets import Dataset
 
-from fastrepl.eval import Evaluator
+import fastrepl
 from fastrepl.eval.model.base import BaseModelEval
 
 
 class TestEvaluator:
     def test_empty_pipeline(self):
         with pytest.raises(ValueError):
-            Evaluator(pipeline=[])
+            fastrepl.Evaluator(pipeline=[])
 
     def test_single_node(self):
         class MockEval(BaseModelEval):
@@ -16,7 +15,7 @@ class TestEvaluator:
                 return context + sample + "0"
 
         pipeline = [MockEval()]
-        assert Evaluator(pipeline).run("1", "2") == "210"
+        assert fastrepl.Evaluator(pipeline).run("1", "2") == "210"
 
     def test_two_node(self):
         class MockEval(BaseModelEval):
@@ -24,4 +23,4 @@ class TestEvaluator:
                 return context + sample + "0"
 
         pipeline = [MockEval(), MockEval()]
-        assert Evaluator(pipeline).run("1", "2") == "21010"
+        assert fastrepl.Evaluator(pipeline).run("1", "2") == "21010"

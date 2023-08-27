@@ -2,7 +2,7 @@ import pytest
 import openai.error
 import litellm.exceptions
 
-from fastrepl.run.error import check_retryable_and_log, RetryableException
+from fastrepl.llm import check_retryable_and_log
 
 
 class TesthandleLLMError:

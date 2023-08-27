@@ -1,24 +1,12 @@
 # High-Level Concepts
 
-## Run
-All about running a LLM. Lives in `fastrepl/run`.
+## Evaluation
 
-## Eval
-All about evaluating a LLM app.
+### Metrics
 
-- Human eval: `fastrepl/eval/human`
-- Model eval: `fastrepl/eval/model`
-- Metrics: `fastrepl/eval/metric`
+### Model Graded
 
-## Polish
-All about improving a LLM app.
+### Human Graded
 
-### Selectable
-TBD
-
+## Meta Evaluation
 ### Updatable
-TBD
-
-## Loop
-TBD
-
