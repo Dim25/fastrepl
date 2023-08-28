@@ -25,6 +25,7 @@ No. **FastREPL** will help you to evaluate and polish your LLM based app.
    getting_started/design_goals.md
    getting_started/concepts.md
    getting_started/model_graded_eval.md
+   getting_started/env.md
 
 .. toctree::
    :maxdepth: 1
