@@ -13,7 +13,7 @@ NUM_THREADS = getenv("NUM_THREADS", 8)
 
 class BaseRunner(ABC):
     @abstractmethod
-    def run(self) -> None:
+    def run(self) -> Dataset:
         pass
 
 
@@ -33,11 +33,7 @@ class LocalRunner(BaseRunner):
         self._interactive_semaphore = threading.Semaphore(1)
 
     def _run_eval(self, sample: str) -> str:
-        if self._evaluator.is_interactive():
-            with self._interactive_semaphore:
-                return self._evaluator.run(sample)
-        else:
-            return self._evaluator.run(sample)
+        return self._evaluator.run(sample)
 
     def run(self) -> Dataset:
         results = []
@@ -55,13 +51,25 @@ class LocalRunner(BaseRunner):
 
 
 class LocalRunnerREPL(LocalRunner):
-    pass
+    def __init__(
+        self,
+        evaluator: fastrepl.Evaluator,
+        dataset: Dataset,
+        input_feature: str = "input",
+        output_feature: str = "prediction",
+    ) -> None:
+        super().__init__(evaluator, dataset, input_feature, output_feature)
+        # NOTE: We can't run interactive evaluators in parallel
+        self._interactive_semaphore = threading.Semaphore(1)
+
+    def _run_eval(self, sample: str) -> str:
+        if self._evaluator.is_interactive():
+            with self._interactive_semaphore:
+                return self._evaluator.run(sample)
+        else:
+            return self._evaluator.run(sample)
 
 
 class RemoteRunner(BaseRunner):
     def __init__(self) -> None:
         raise NotImplementedError
-
-
-class RemoteRunnerREPL(RemoteRunner):
-    pass

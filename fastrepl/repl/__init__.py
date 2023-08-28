@@ -16,7 +16,6 @@ from fastrepl.eval import (
 
 from fastrepl.runner import (
     LocalRunnerREPL as LocalRunner,
-    RemoteRunnerREPL as RemoteRunner,
 )
 
 from fastrepl.errors import (
