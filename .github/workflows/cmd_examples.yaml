@@ -35,6 +35,11 @@ jobs:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
       ### START
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
