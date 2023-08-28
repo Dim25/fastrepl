@@ -1,4 +1,5 @@
 import random
+import warnings
 from typing import Tuple, Dict, List
 
 from fastrepl.utils import prompt
@@ -76,7 +77,11 @@ class LLMClassifier(BaseEval):
             ),
         )["choices"][0]["message"]["content"]
 
-        return self.mapping.get(result, "UNKNOWN")
+        try:
+            return self.mapping[result]
+        except KeyError:
+            warnings.warn(f"classification result not in mapping: {result!r}")
+            return "UNKNOWN"
 
     def is_interactive(self) -> bool:
         return False

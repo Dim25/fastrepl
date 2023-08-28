@@ -1,4 +1,5 @@
 import random
+import warnings
 from typing import Tuple, Dict, List
 
 from fastrepl.utils import prompt
@@ -79,7 +80,11 @@ class LLMChainOfThoughtClassifier(BaseEval):
         )["choices"][0]["message"]["content"]
         # fmt: on
 
-        return self.mapping.get(result[-1], "UNKNOWN")
+        try:
+            return self.mapping[result[-1]]
+        except KeyError:
+            warnings.warn(f"classification result not in mapping: {result!r}")
+            return "UNKNOWN"
 
     def is_interactive(self) -> bool:
         return False
