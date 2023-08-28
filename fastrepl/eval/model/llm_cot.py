@@ -2,7 +2,7 @@ import random
 from typing import Tuple, List, Dict
 
 from fastrepl.llm import completion, SUPPORTED_MODELS
-from fastrepl.eval.model.base import BaseModelEval
+from fastrepl.eval.base import BaseEval
 from fastrepl.eval.model.utils import render_labels
 
 LLM_COT_SYSTEM_TPL = """If user gave you the text, do step by step thinking that is needed to classify it.
@@ -17,7 +17,7 @@ When do step-by-step thinking, you must consider the following:
 ### Thoghts:"""
 
 
-class LLMChainOfThought(BaseModelEval):
+class LLMChainOfThought(BaseEval):
     __slots__ = ("model", "references", "rg", "system_msg")
 
     def __init__(
@@ -62,3 +62,6 @@ class LLMChainOfThought(BaseModelEval):
         # fmt: on
 
         return result
+
+    def is_interactive(self) -> bool:
+        return False

@@ -2,7 +2,7 @@ import random
 from typing import Tuple, Dict, List
 
 from fastrepl.llm import completion, SUPPORTED_MODELS
-from fastrepl.eval.model.base import BaseModelEval
+from fastrepl.eval.base import BaseEval
 from fastrepl.eval.model.utils import render_labels, mapping_from_labels
 
 LLM_COT_CLASSIFY_SYSTEM_TPL = """You are master of classification who can classify any text according to the user's instructions.
@@ -20,7 +20,7 @@ For classification, only output one of these label keys:
 When responding, strictly follow this format: ### Thoghts: <STEP_BY_STEP_THOUGHTS>\n### Label: <LABEL>"""
 
 
-class LLMChainOfThoughtClassifier(BaseModelEval):
+class LLMChainOfThoughtClassifier(BaseEval):
     __slots__ = ("model", "mapping", "references", "rg", "system_msg")
 
     def __init__(
@@ -64,3 +64,6 @@ class LLMChainOfThoughtClassifier(BaseModelEval):
         # fmt: on
 
         return self.mapping.get(result[-1], "UNKNOWN")
+
+    def is_interactive(self) -> bool:
+        return False

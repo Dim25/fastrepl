@@ -1,14 +1,13 @@
 import functools
 from typing import List
 
-from fastrepl.eval.model.base import BaseModelEval
+from fastrepl.eval.base import BaseEval
 
 
-# TODO: we assume only model-eval here.
 class Evaluator:
     __slots__ = ["pipeline"]
 
-    def __init__(self, pipeline: List[BaseModelEval]) -> None:
+    def __init__(self, pipeline: List[BaseEval]) -> None:
         if len(pipeline) == 0:
             raise ValueError("Pipeline cannot be empty")
         self.pipeline = pipeline
@@ -19,3 +18,6 @@ class Evaluator:
             self.pipeline,
             initial_context,
         )
+
+    def is_interactive(self) -> bool:
+        return any(eval.is_interactive() for eval in self.pipeline)

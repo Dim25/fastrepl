@@ -1,7 +1,15 @@
 import pytest
 
 import fastrepl
-from fastrepl.eval.model.base import BaseModelEval
+from fastrepl.eval.base import BaseEval
+
+
+class MockEval(BaseEval):
+    def compute(self, sample: str, context="") -> str:
+        return context + sample + "0"
+
+    def is_interactive(self) -> bool:
+        return False
 
 
 class TestEvaluator:
@@ -10,17 +18,9 @@ class TestEvaluator:
             fastrepl.Evaluator(pipeline=[])
 
     def test_single_node(self):
-        class MockEval(BaseModelEval):
-            def compute(self, sample: str, context="") -> str:
-                return context + sample + "0"
-
         pipeline = [MockEval()]
         assert fastrepl.Evaluator(pipeline).run("1", "2") == "210"
 
     def test_two_node(self):
-        class MockEval(BaseModelEval):
-            def compute(self, sample: str, context="") -> str:
-                return context + sample + "0"
-
         pipeline = [MockEval(), MockEval()]
         assert fastrepl.Evaluator(pipeline).run("1", "2") == "21010"

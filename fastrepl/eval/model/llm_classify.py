@@ -2,7 +2,7 @@ import random
 from typing import Tuple, Dict, List
 
 from fastrepl.llm import completion, SUPPORTED_MODELS
-from fastrepl.eval.model.base import BaseModelEval
+from fastrepl.eval.base import BaseEval
 from fastrepl.eval.model.utils import (
     render_labels,
     logit_bias_from_labels,
@@ -19,7 +19,7 @@ Only output one of these label keys:
 {label_keys}"""
 
 
-class LLMClassifier(BaseModelEval):
+class LLMClassifier(BaseEval):
     __slots__ = ("model", "mapping", "rg", "references", "system_msg")
 
     def __init__(
@@ -67,3 +67,6 @@ class LLMClassifier(BaseModelEval):
         )["choices"][0]["message"]["content"]
 
         return self.mapping.get(result, "UNKNOWN")
+
+    def is_interactive(self) -> bool:
+        return False
