@@ -1,23 +1,40 @@
 import random
 from typing import Tuple, Dict, List
 
+from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEval
 from fastrepl.eval.model.utils import render_labels, mapping_from_labels
 
-LLM_COT_CLASSIFY_SYSTEM_TPL = """You are master of classification who can classify any text according to the user's instructions.
-If user gave you the text, do step by step thinking first, and classify it.
 
-When do step-by-step thinking(less than 30 words), you must consider the following:
-{context}
+@prompt
+def system_prompt(context, labels, label_keys):
+    """You are master of classification who can classify any text according to the user's instructions.
+    If user gave you the text, do step by step thinking first, and classify it.
 
-These are the labels you can use:
-{labels}
+    When do step-by-step thinking(less than 30 words), you must consider the following:
+    {{context}}
 
-For classification, only output one of these label keys:
-{label_keys}
+    These are the labels you can use:
+    {{labels}}
 
-When responding, strictly follow this format: ### Thoghts: <STEP_BY_STEP_THOUGHTS>\n### Label: <LABEL>"""
+    For classification, only output one of these label keys:
+    {{label_keys}}
+
+    When responding, strictly follow this format:
+    ### Thoghts
+    <STEP_BY_STEP_THOUGHTS>
+
+    ### Label
+    <LABEL>"""
+
+
+@prompt
+def final_message_prompt(sample, context=""):
+    """{% if context != '' %}
+    Info about the text: {{ context }}
+    {% endif %}
+    Text to think about: {{ sample }}"""
 
 
 class LLMChainOfThoughtClassifier(BaseEval):
@@ -37,10 +54,10 @@ class LLMChainOfThoughtClassifier(BaseEval):
         self.rg = rg
         self.system_msg = {
             "role": "system",
-            "content": LLM_COT_CLASSIFY_SYSTEM_TPL.format(
+            "content": system_prompt(
                 context=context,
                 labels=render_labels(self.mapping),
-                label_keys=self.mapping.keys(),
+                label_keys=", ".join(self.mapping.keys()),
             ),
         }
 
@@ -51,11 +68,10 @@ class LLMChainOfThoughtClassifier(BaseEval):
         for input, output in references:
             messages.append({"role": "user", "content": input})
             messages.append({"role": "assistant", "content": output})
-
-        additional_info = f"Info about the text: {context}\n" if context else ""
         messages.append(
-            {"role": "user", "content": f"{additional_info}Text to classify: {sample}"}
+            {"role": "user", "content": final_message_prompt(sample, context)}
         )
+
         # fmt: off
         result = completion(
             model=self.model,

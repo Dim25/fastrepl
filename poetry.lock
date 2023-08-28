@@ -4166,4 +4166,4 @@ tui = ["textual"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "69c851d6e7673daa3e7fffd4b2e022dfc0463ee918359ca4b7bc67a40eaefdc5"
+content-hash = "0f20de8ff7188b042ccfc85e9514812aebc837fc01a91e894f6382c553ea0e4b"

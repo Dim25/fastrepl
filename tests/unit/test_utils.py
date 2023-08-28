@@ -1,7 +1,7 @@
 import pytest
 import inspect
 
-from fastrepl.utils import LocalContext, HistoryDict, ensure
+from fastrepl.utils import LocalContext, HistoryDict, ensure, prompt
 
 
 class TestLocalContext:
@@ -172,3 +172,71 @@ class TestDecorator:
         assert fn1()
         with pytest.raises(AssertionError):
             assert fn2()
+
+
+class TestPromt:
+    def test_basic(self):
+        @prompt
+        def fn(instruction, examples, question):
+            """{{ instruction }}
+
+            {% for example in examples %}
+            Q: {{ example.question }}
+            A: {{ example.answer }}
+            {% endfor %}
+            Q: {{ question }}
+            """
+
+        assert (
+            fn("Instruction", [], "Question")
+            == """Instruction
+
+Q: Question"""
+        )
+
+        assert (
+            fn(instruction="Instruction", examples=[], question="Question")
+            == """Instruction
+
+Q: Question"""
+        )
+
+        assert (
+            fn(
+                instruction="Instruction",
+                examples=[
+                    {"question": "q1", "answer": "a1"},
+                    {"question": "q2", "answer": "a2"},
+                ],
+                question="a3",
+            )
+            == """Instruction
+
+Q: q1
+A: a1
+Q: q2
+A: a2
+Q: a3"""
+        )
+
+    def test_if(self):
+        @prompt
+        def fn(question, context=""):
+            """{% if context != '' %}
+            Consider the following context when answering the question:
+            {{ context }}\n
+            {% endif %}
+            Q: {{ question }}
+            """
+
+        assert fn("hello?", "") == """Q: hello?"""
+        assert fn("hello?") == """Q: hello?"""
+        assert fn(question="hello?") == """Q: hello?"""
+
+        assert (
+            fn("hello?", context="this is context")
+            == """Consider the following context when answering the question:
+this is context
+
+Q: hello?"""
+        )

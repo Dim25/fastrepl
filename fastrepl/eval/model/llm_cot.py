@@ -1,20 +1,30 @@
 import random
 from typing import Tuple, List, Dict
 
+from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEval
 from fastrepl.eval.model.utils import render_labels
 
-LLM_COT_SYSTEM_TPL = """If user gave you the text, do step by step thinking that is needed to classify it.
-Use less than 50 words.
 
-These are the labels that will be used later to classify the text:
-{labels}
+@prompt
+def system_prompt(labels, context):
+    """If user gave you the text, do step by step thinking that is needed to classify the given
+    Use less than 50 words.
 
-When do step-by-step thinking, you must consider the following:
-{context}
+    These are the labels that will be used later to classify the text:
+    {{labels}}
 
-### Thoghts:"""
+    When do step-by-step thinking, you must consider the following:
+    {{context}}"""
+
+
+@prompt
+def final_message_prompt(sample, context=""):
+    """{% if context != '' %}
+    Info about the text: {{ context }}
+    {% endif %}
+    Text to think about: {{ sample }}"""
 
 
 class LLMChainOfThought(BaseEval):
@@ -24,6 +34,7 @@ class LLMChainOfThought(BaseEval):
         self,
         context: str,
         labels: Dict[str, str],
+        previous="",
         model: SUPPORTED_MODELS = "gpt-3.5-turbo",
         rg=random.Random(42),
         references: List[Tuple[str, str]] = [],
@@ -33,7 +44,7 @@ class LLMChainOfThought(BaseEval):
         self.rg = rg
         self.system_msg = {
             "role": "system",
-            "content": LLM_COT_SYSTEM_TPL.format(
+            "content": system_prompt(
                 context=context,
                 labels=render_labels(labels),
             ),
@@ -46,14 +57,10 @@ class LLMChainOfThought(BaseEval):
         for input, output in references:
             messages.append({"role": "user", "content": input})
             messages.append({"role": "assistant", "content": output})
-
-        additional_info = f"Info about the text: {context}\n" if context else ""
         messages.append(
-            {
-                "role": "user",
-                "content": f"{additional_info}Text to think about: {sample}",
-            }
+            {"role": "user", "content": final_message_prompt(sample, context)}
         )
+
         # fmt: off
         result = completion(
             model=self.model,

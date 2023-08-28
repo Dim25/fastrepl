@@ -1,6 +1,7 @@
 import random
 from typing import Tuple, Dict, List
 
+from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEval
 from fastrepl.eval.model.utils import (
@@ -9,14 +10,25 @@ from fastrepl.eval.model.utils import (
     mapping_from_labels,
 )
 
-LLM_CLASSIFIER_SYSTEM_TPL = """You are master of classification who can classify any text according to the user's instructions.
-{context}
 
-These are the labels you can use:
-{labels}
+@prompt
+def system_prompt(context, labels, label_keys):
+    """You are master of classification who can classify any text according to the user's instructions.
+    {{context}}
 
-Only output one of these label keys:
-{label_keys}"""
+    These are the labels you can use:
+    {{labels}}
+
+    Only output one of these label keys:
+    {{label_keys}}"""
+
+
+@prompt
+def final_message_prompt(sample, context=""):
+    """{% if context != '' %}
+    Info about the text: {{ context }}
+    {% endif %}
+    Text to think about: {{ sample }}"""
 
 
 class LLMClassifier(BaseEval):
@@ -36,10 +48,10 @@ class LLMClassifier(BaseEval):
         self.references = references
         self.system_msg = {
             "role": "system",
-            "content": LLM_CLASSIFIER_SYSTEM_TPL.format(
+            "content": system_prompt(
                 context=context,
                 labels=render_labels(self.mapping),
-                label_keys=self.mapping.keys(),
+                label_keys=", ".join(self.mapping.keys()),
             ),
         }
 
@@ -50,10 +62,8 @@ class LLMClassifier(BaseEval):
         for input, output in references:
             messages.append({"role": "user", "content": input})
             messages.append({"role": "assistant", "content": output})
-
-        additional_info = f"Info about the text: {context}\n" if context else ""
         messages.append(
-            {"role": "user", "content": f"{additional_info}Text to classify: {sample}"}
+            {"role": "user", "content": final_message_prompt(sample, context)}
         )
 
         result = completion(
