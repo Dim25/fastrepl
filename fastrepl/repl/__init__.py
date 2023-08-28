@@ -23,18 +23,3 @@ from fastrepl.errors import (
     InvalidStatusError,
     EmptyGraphError,
 )
-
-from contextvars import ContextVar
-from contextlib import contextmanager
-
-
-IS_REPL = ContextVar[bool]("IS_REPL", default=False)
-
-
-@contextmanager
-def REPL():
-    IS_REPL.set(True)
-    try:
-        yield
-    finally:
-        IS_REPL.set(False)

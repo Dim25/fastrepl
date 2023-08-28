@@ -1,6 +1,6 @@
 import inspect
 
-from fastrepl.utils import LocalContext
+from fastrepl.utils import LocalContext, getenv
 from fastrepl.repl.context import REPLContext
 
 
@@ -14,16 +14,13 @@ class Updatable:
     ):
         self._key, self._value, self.what, self.how = key, value, what, how
 
-        from fastrepl.repl import IS_REPL
-
-        if IS_REPL.get():
+        if getenv("FASTREPL_INTERACTIVE", 0) > 0:
+            print("registering updatable", key, value)
             self._ctx = LocalContext(inspect.stack()[1])
             REPLContext.trace(self._ctx, self._key, value)
 
     @property
     def value(self) -> str:
-        from fastrepl.repl import IS_REPL
-
-        if IS_REPL.get():
+        if getenv("FASTREPL_INTERACTIVE", 0) > 0:
             return REPLContext.get_current(self._ctx, self._key)
         return self._value
