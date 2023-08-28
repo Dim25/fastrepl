@@ -1,5 +1,11 @@
 # Caching
 
-- Currently we use in-memory caching using [model and prompt as a key](https://docs.litellm.ai/docs/caching). 
+- We have disk-based, exact matching caching enabled through `litellm`'s `GPTCache` integration.
+```python
+import fastrepl
 
-- Eventually we will have our own implementation of disk-based caching.
+fastrepl.LLMCache.enable()
+# fastrepl.LLMCache.disable()
+```
+
+- We will add more caching options including remote caching in the future.
