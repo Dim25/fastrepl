@@ -1,19 +1,37 @@
 from typing import Literal, List, Dict
-import json
+import os
 import functools
 
 import backoff
 import openai.error
 
-import litellm
-from litellm import completion as litellm_completion, ModelResponse
-
-litellm.telemetry = False  # pragma: no cover
-litellm.caching = False  # pragma: no cover
-litellm.caching_with_models = False  # pragma: no cover
-
 import fastrepl
 from fastrepl.utils import getenv, pprint
+
+
+from gptcache import cache
+from gptcache.manager import get_data_manager
+
+
+def cache_enable_func(*args, **kwargs):
+    return fastrepl.LLMCache.enabled()
+
+
+dir_name, _ = os.path.split(os.path.abspath(__file__))
+cache.init(
+    cache_enable_func=cache_enable_func,
+    data_manager=get_data_manager(
+        data_path=f"{dir_name}/.fastrepl.cache", max_size=1000
+    ),
+)
+
+import litellm
+from litellm import ModelResponse
+from litellm.cache import completion as litellm_completion
+
+litellm.telemetry = False  # pragma: no cover
+litellm.caching = True  # pragma: no cover
+litellm.caching_with_models = True  # pragma: no cover
 
 
 # TODO: This logging should be added to some global context and rendered in Live display
@@ -65,26 +83,15 @@ def completion(
     logit_bias: Dict[int, int] = {},
     max_tokens: int = 100,
 ) -> ModelResponse:
-    if fastrepl.llm_cache is not None:
-        hit = fastrepl.llm_cache.lookup(model, prompt=json.dumps(messages))
-        if hit is not None:
-            ret = json.loads(hit)
-            ret["_fastrepl_cached"] = True
-            return ret  # TODO: This is not ModelResponse anymore
-
     try:
         result = litellm_completion(  # pragma: no cover
-            model,
-            messages,
+            model=model,
+            messages=messages,
             temperature=temperature,
             logit_bias=logit_bias,
             max_tokens=max_tokens,
             force_timeout=30,
         )
-        if fastrepl.llm_cache is not None:
-            fastrepl.llm_cache.update(
-                model, prompt=json.dumps(messages), response=json.dumps(result)
-            )
         return result
     except Exception as e:
         if check_retryable_and_log(e):

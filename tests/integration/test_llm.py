@@ -1,8 +1,7 @@
 import pytest
 
 import fastrepl
-from fastrepl.llm import tokenize, completion
-from fastrepl.cache import SQLiteCache
+from fastrepl.llm import completion, tokenize
 
 
 class TestTokenize:
@@ -55,37 +54,19 @@ class TestTokenize:
             tokenize("j2-ultra", "A")
 
 
-class TestCache:
-    def test_mark(self):
-        fastrepl.llm_cache = SQLiteCache()
-        fastrepl.llm_cache.clear()
+def test_gpt_cache():
+    fastrepl.LLMCache.enable()
+    assert fastrepl.LLMCache.enabled() == True
 
-        result_1 = completion(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}]
-        )
-        assert result_1.get("_fastrepl_cached", None) is None
+    result1 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
+    result2 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
+    assert not result1.get("gptcache")
+    assert result2.get("gptcache")
 
-        result_2 = completion(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}]
-        )
-        assert result_2.pop("_fastrepl_cached")
+    fastrepl.LLMCache.disable()
+    assert fastrepl.LLMCache.enabled() == False
 
-        assert result_1 == result_2
-
-    def test_response(self):
-        fastrepl.llm_cache = SQLiteCache()
-        fastrepl.llm_cache.clear()
-
-        fastrepl.llm_cache.update(
-            "gpt-3.5-turbo",
-            prompt='[{"role": "user", "content": "hello"}]',
-            response='{"text": "hello"}',
-        )
-
-        assert fastrepl.llm_cache is not None
-
-        result = completion(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}]
-        )
-        assert result.pop("_fastrepl_cached")
-        assert result == {"text": "hello"}
+    result3 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
+    result4 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
+    assert not result1.get("gptcache")
+    assert not result1.get("gptcache")

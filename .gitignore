@@ -11,3 +11,4 @@ docs/_build/
 cov.xml
 dist
 **/wandb
+*.cache
