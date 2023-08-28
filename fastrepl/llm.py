@@ -6,7 +6,7 @@ import backoff
 import openai.error
 
 import fastrepl
-from fastrepl.utils import getenv, pprint
+from fastrepl.utils import getenv
 
 
 from gptcache import cache
@@ -34,26 +34,44 @@ litellm.caching = True  # pragma: no cover
 litellm.caching_with_models = True  # pragma: no cover
 
 
-# TODO: This logging should be added to some global context and rendered in Live display
-def check_retryable_and_log(exp: Exception) -> bool:
-    if isinstance(exp, openai.error.ServiceUnavailableError):
-        pprint("[bright_red]Service Unavailable[/bright_red]")
-    elif isinstance(exp, openai.error.APIError):
-        pprint("[bright_red]API Error[/bright_red]")
-    elif isinstance(exp, openai.error.RateLimitError):
-        pprint("[bright_red]Rate Limit Error[/bright_red]")
-    elif isinstance(exp, openai.error.APIConnectionError):
-        pprint("[bright_red]API Connection Error[/bright_red]")
-    elif isinstance(exp, openai.error.Timeout):
-        pprint("[bright_red]Timeout[/bright_red]")
+class RetryConstantException(Exception):
+    pass
+
+
+class RetryExpoException(Exception):
+    pass
+
+
+def handle_llm_exception(e: Exception):
+    if isinstance(
+        e,
+        (
+            openai.error.APIError,
+            openai.error.TryAgain,
+            openai.error.Timeout,
+            openai.error.ServiceUnavailableError,
+        ),
+    ):
+        raise RetryConstantException from e
+    elif isinstance(
+        e,
+        (
+            openai.error.APIConnectionError,
+            openai.error.InvalidRequestError,  # TODO: context_length_exceeded
+            openai.error.AuthenticationError,
+            openai.error.PermissionError,
+            openai.error.InvalidAPIType,
+            openai.error.SignatureVerificationError,
+        ),
+    ):
+        raise e
+    elif isinstance(
+        e,
+        openai.error.RateLimitError,
+    ):
+        raise RetryExpoException from e
     else:
-        return False
-    return True
-
-
-class RetryableException(Exception):
-    def __init__(self):
-        super(Exception, self).__init__("retryable exception from fastrepl")
+        raise e
 
 
 SUPPORTED_MODELS = Literal[  # pragma: no cover
@@ -71,9 +89,16 @@ SUPPORTED_MODELS = Literal[  # pragma: no cover
 
 
 @backoff.on_exception(
+    wait_gen=backoff.constant,
+    exception=(RetryConstantException),
+    max_tries=3,
+    interval=3,
+)
+@backoff.on_exception(
     wait_gen=backoff.expo,
-    exception=(RetryableException),
-    max_value=60,
+    exception=(RetryExpoException),
+    jitter=backoff.full_jitter,
+    max_value=100,
     factor=1.5,
 )
 def completion(
@@ -90,14 +115,11 @@ def completion(
             temperature=temperature,
             logit_bias=logit_bias,
             max_tokens=max_tokens,
-            force_timeout=30,
+            force_timeout=20,
         )
         return result
     except Exception as e:
-        if check_retryable_and_log(e):
-            raise RetryableException() from e
-        else:
-            raise e
+        handle_llm_exception(e)
 
 
 @functools.lru_cache(maxsize=None)
