@@ -4,7 +4,6 @@ from typing import Tuple, List, Dict
 from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEvalWithoutReference
-from fastrepl.eval.model.utils import render_labels
 
 
 @prompt
@@ -34,40 +33,40 @@ class LLMChainOfThought(BaseEvalWithoutReference):
         self,
         context: str,
         labels: Dict[str, str],
-        previous="",
         model: SUPPORTED_MODELS = "gpt-3.5-turbo",
         rg=random.Random(42),
         references: List[Tuple[str, str]] = [],
     ) -> None:
+        self.context = context
+        self.labels = labels
         self.model = model
-        self.references = references
         self.rg = rg
-        self.system_msg = {
-            "role": "system",
-            "content": system_prompt(
-                context=context,
-                labels=render_labels(labels),
-            ),
-        }
+        self.references = references
+
+    def _shuffle(self):
+        references = self.rg.sample(self.references, len(self.references))
+        return references
 
     def compute(self, prediction: str, context="") -> str:
-        references = self.rg.sample(self.references, len(self.references))
+        references = self._shuffle()
 
-        messages = [self.system_msg]
+        instruction = system_prompt(
+            context=context,
+            labels="\n".join(f"{k}: {v}" for k, v in self.labels.items()),
+        )
+
+        messages = [{"role": "system", "content": instruction}]
         for input, output in references:
             messages.append({"role": "user", "content": input})
             messages.append({"role": "assistant", "content": output})
         messages.append(
-            {
-                "role": "user",
-                "content": final_message_prompt(prediction, context),
-            }
+            {"role": "user", "content": final_message_prompt(prediction, context)}
         )
 
         # fmt: off
         result = completion(
             model=self.model,
-            messages=messages, 
+            messages=messages,
         )["choices"][0]["message"]["content"]
         # fmt: on
 

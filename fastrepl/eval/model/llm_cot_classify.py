@@ -5,7 +5,7 @@ from typing import Tuple, Dict, List
 from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEvalWithoutReference
-from fastrepl.eval.model.utils import render_labels, mapping_from_labels
+from fastrepl.eval.model.utils import mapping_from_labels
 
 
 @prompt
@@ -39,7 +39,7 @@ def final_message_prompt(sample, context=""):
 
 
 class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
-    __slots__ = ("model", "mapping", "references", "rg", "system_msg")
+    __slots__ = ("model", "references", "rg", "system_msg")
 
     def __init__(
         self,
@@ -49,23 +49,27 @@ class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
         rg=random.Random(42),
         references: List[Tuple[str, str]] = [],
     ) -> None:
+        self.context = context
+        self.labels = labels
         self.model = model
-        self.mapping = mapping_from_labels(labels)
-        self.references = references
         self.rg = rg
-        self.system_msg = {
-            "role": "system",
-            "content": system_prompt(
-                context=context,
-                labels=render_labels(self.mapping),
-                label_keys=", ".join(self.mapping.keys()),
-            ),
-        }
+        self.references = references
+
+    def _shuffle(self):
+        mapping = mapping_from_labels(self.labels, rg=self.rg)
+        references = self.rg.sample(self.references, len(self.references))
+        return mapping, references
 
     def compute(self, sample: str, context="") -> str:
-        references = self.rg.sample(self.references, len(self.references))
+        mapping, references = self._shuffle()
 
-        messages = [self.system_msg]
+        instruction = system_prompt(
+            context=self.context,
+            labels="\n".join(f"{m.token}: {m.description}" for m in mapping),
+            label_keys=", ".join(m.token for m in mapping),
+        )
+
+        messages = [{"role": "system", "content": instruction}]
         for input, output in references:
             messages.append({"role": "user", "content": input})
             messages.append({"role": "assistant", "content": output})
@@ -76,15 +80,16 @@ class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
         # fmt: off
         result = completion(
             model=self.model,
-            messages=messages, 
+            messages=messages,
         )["choices"][0]["message"]["content"]
         # fmt: on
 
-        try:
-            return self.mapping[result[-1]]
-        except KeyError:
-            warnings.warn(f"classification result not in mapping: {result!r}")
-            return "UNKNOWN"
+        for m in mapping:
+            if m.token == result[-1]:
+                return m.label
+
+        warnings.warn(f"classification result not in mapping: {result!r}")
+        return "UNKNOWN"
 
     def is_interactive(self) -> bool:
         return False

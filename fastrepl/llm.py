@@ -9,7 +9,6 @@ import openai.error
 import fastrepl
 from fastrepl.utils import getenv
 
-
 from gptcache import cache
 from gptcache.manager import get_data_manager
 
@@ -31,8 +30,6 @@ from litellm import ModelResponse
 from litellm.cache import completion as litellm_completion
 
 litellm.telemetry = False  # pragma: no cover
-litellm.caching = True  # pragma: no cover
-litellm.caching_with_models = True  # pragma: no cover
 
 
 class RetryConstantException(Exception):

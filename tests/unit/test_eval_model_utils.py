@@ -3,8 +3,8 @@ import random
 
 from fastrepl.eval.model.utils import (
     logit_bias_from_labels,
-    render_labels,
     mapping_from_labels,
+    LabelMapping,
 )
 
 
@@ -77,25 +77,6 @@ class TestLogitBiasForClassification:
             logit_bias_from_labels("gpt-3.5-turbo", set(["GOOD", "GREAT"]))
 
 
-def test_render_labels():
-    text = render_labels(
-        mapping={
-            "A": "Given text meets the criteria.",
-            "B": "Given text does not meet the criteria.",
-            "C": "Given text is not even related to the criteria.",
-        },
-        rg=random.Random(42),
-    )
-    assert (
-        text
-        == """
-B: Given text does not meet the criteria.
-A: Given text meets the criteria.
-C: Given text is not even related to the criteria.
-""".strip()
-    )
-
-
 def test_mapping_from_labels():
     mapping = mapping_from_labels(
         labels={
@@ -104,9 +85,10 @@ def test_mapping_from_labels():
             "NEUTRAL": "Given text is neutral.",
         },
         start=ord("A"),
+        rg=random.Random(42),
     )
-    assert mapping == {
-        "A": "POSITIVE",
-        "B": "NEGATIVE",
-        "C": "NEUTRAL",
-    }
+    assert mapping == [
+        LabelMapping("A", "NEUTRAL", "Given text is neutral."),
+        LabelMapping("B", "POSITIVE", "Given text is positive."),
+        LabelMapping("C", "NEGATIVE", "Given text is negative."),
+    ]

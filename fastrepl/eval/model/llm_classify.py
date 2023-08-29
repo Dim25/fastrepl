@@ -6,7 +6,6 @@ from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEvalWithoutReference
 from fastrepl.eval.model.utils import (
-    render_labels,
     logit_bias_from_labels,
     mapping_from_labels,
 )
@@ -25,11 +24,9 @@ def system_prompt(context, labels, label_keys):
 
 
 @prompt
-def final_message_prompt(sample, context=""):
-    """{% if context != '' %}
-    Info about the text: {{ context }}
-    {% endif %}
-    Text to think about: {{ sample }}"""
+def final_message_prompt(sample, context):
+    """Info about the text: {{ context }}
+    Text to classify: {{ sample }}"""
 
 
 class LLMClassifier(BaseEvalWithoutReference):
@@ -43,23 +40,27 @@ class LLMClassifier(BaseEvalWithoutReference):
         rg=random.Random(42),
         references: List[Tuple[str, str]] = [],
     ) -> None:
+        self.labels = labels
+        self.global_context = context
         self.model = model
-        self.mapping = mapping_from_labels(labels)
         self.rg = rg
         self.references = references
-        self.system_msg = {
-            "role": "system",
-            "content": system_prompt(
-                context=context,
-                labels=render_labels(self.mapping),
-                label_keys=", ".join(self.mapping.keys()),
-            ),
-        }
 
-    def compute(self, sample: str, context="") -> str:
+    def _shuffle(self):
+        mapping = mapping_from_labels(self.labels, rg=self.rg)
         references = self.rg.sample(self.references, len(self.references))
+        return mapping, references
 
-        messages = [self.system_msg]
+    def compute(self, sample: str, context: str) -> str:
+        mapping, references = self._shuffle()
+
+        instruction = system_prompt(
+            context=self.global_context,
+            labels="\n".join(f"{m.token}: {m.description}" for m in mapping),
+            label_keys=", ".join(m.token for m in mapping),
+        )
+
+        messages = [{"role": "system", "content": instruction}]
         for input, output in references:
             messages.append({"role": "user", "content": input})
             messages.append({"role": "assistant", "content": output})
@@ -72,16 +73,16 @@ class LLMClassifier(BaseEvalWithoutReference):
             messages=messages,
             max_tokens=1,  #  NOTE: when using logit_bias for classification, max_tokens should be 1
             logit_bias=logit_bias_from_labels(
-                self.model,
-                set(self.mapping.keys()),
+                self.model, set(m.token for m in mapping)
             ),
         )["choices"][0]["message"]["content"]
 
-        try:
-            return self.mapping[result]
-        except KeyError:
-            warnings.warn(f"classification result not in mapping: {result!r}")
-            return "UNKNOWN"
+        for m in mapping:
+            if m.token == result:
+                return m.label
+
+        warnings.warn(f"classification result not in mapping: {result!r}")
+        return "UNKNOWN"
 
     def is_interactive(self) -> bool:
         return False
