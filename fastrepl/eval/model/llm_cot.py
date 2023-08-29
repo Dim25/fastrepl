@@ -3,7 +3,7 @@ from typing import Tuple, List, Dict
 
 from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
-from fastrepl.eval.base import BaseEval
+from fastrepl.eval.base import BaseEvalWithoutReference
 from fastrepl.eval.model.utils import render_labels
 
 
@@ -27,7 +27,7 @@ def final_message_prompt(sample, context=""):
     Text to think about: {{ sample }}"""
 
 
-class LLMChainOfThought(BaseEval):
+class LLMChainOfThought(BaseEvalWithoutReference):
     __slots__ = ("model", "references", "rg", "system_msg")
 
     def __init__(
@@ -50,7 +50,7 @@ class LLMChainOfThought(BaseEval):
             ),
         }
 
-    def compute(self, sample: str, context="") -> str:
+    def compute(self, prediction: str, context="") -> str:
         references = self.rg.sample(self.references, len(self.references))
 
         messages = [self.system_msg]
@@ -58,7 +58,10 @@ class LLMChainOfThought(BaseEval):
             messages.append({"role": "user", "content": input})
             messages.append({"role": "assistant", "content": output})
         messages.append(
-            {"role": "user", "content": final_message_prompt(sample, context)}
+            {
+                "role": "user",
+                "content": final_message_prompt(prediction, context),
+            }
         )
 
         # fmt: off

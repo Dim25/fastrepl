@@ -1,10 +1,10 @@
 import pytest
 
 import fastrepl
-from fastrepl.eval.base import BaseEval
+from fastrepl.eval.base import BaseEvalWithoutReference
 
 
-class MockEval(BaseEval):
+class MockEval(BaseEvalWithoutReference):
     def compute(self, sample: str, context="") -> str:
         return context + sample + "0"
 

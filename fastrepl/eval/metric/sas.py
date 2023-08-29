@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import CrossEncoder, SentenceTransformer
 from transformers import AutoConfig
 
-from fastrepl.eval.metric.base import BaseMetricEval
+from fastrepl.eval.base import BaseEvalWithReference
 
 
 SENTENCE_ANSWER_SIMILARITY_METRICS = Literal["sas", "semantic_answer_similarity"]
@@ -18,7 +18,7 @@ class SASResult(TypedDict):
 
 
 # Modified from https://github.com/deepset-ai/haystack/blob/da677003181c2a2c03d5714672444138caea6be6/haystack/modeling/evaluation/metrics.py#L392
-class SemanticAnswerSimilarityMetric(BaseMetricEval):
+class SemanticAnswerSimilarityMetric(BaseEvalWithReference):
     __slot__ = ("model", "is_cross_encoder")
 
     def __init__(self, model_name_or_path: str, use_gpu=False):

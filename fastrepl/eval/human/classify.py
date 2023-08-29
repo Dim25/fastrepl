@@ -4,10 +4,10 @@ import functools
 from rich.prompt import Prompt
 from rich.console import Console
 
-from fastrepl.eval.base import BaseEval
+from fastrepl.eval.base import BaseEvalWithoutReference
 
 
-class HumanClassifierRich(BaseEval):
+class HumanClassifierRich(BaseEvalWithoutReference):
     def __init__(
         self,
         labels: Dict[str, str],

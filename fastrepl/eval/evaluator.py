@@ -1,13 +1,13 @@
 import functools
 from typing import List
 
-from fastrepl.eval.base import BaseEval
+from fastrepl.eval.base import BaseEvalWithoutReference
 
 
 class Evaluator:
     __slots__ = ["pipeline"]
 
-    def __init__(self, pipeline: List[BaseEval]) -> None:
+    def __init__(self, pipeline: List[BaseEvalWithoutReference]) -> None:
         if len(pipeline) == 0:
             raise ValueError("Pipeline cannot be empty")
         self.pipeline = pipeline

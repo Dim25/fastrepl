@@ -1,7 +1,7 @@
-from typing import Generic, TypeVar, Literal, get_args
+from typing import List, Any, Literal, get_args
 import evaluate
 
-from fastrepl.eval.metric.base import BaseMetricEval
+from fastrepl.eval.base import BaseEvalWithReference
 
 HUGGINGFACE_BUILTIN_METRICS = Literal[
     "precision",
@@ -61,11 +61,8 @@ HUGGINGFACE_BUILTIN_METRICS = Literal[
 
 HUGGINGFACE_FASTREPL_METRICS = Literal["mean_reciprocal_rank", "mean_average_precision"]
 
-Predictions = TypeVar("Predictions")
-References = TypeVar("References")
 
-
-class HuggingfaceMetric(BaseMetricEval, Generic[Predictions, References]):
+class HuggingfaceMetric(BaseEvalWithReference):
     __slots__ = ("name", "module")
 
     def __init__(self, name: str) -> None:
@@ -96,7 +93,7 @@ class HuggingfaceMetric(BaseMetricEval, Generic[Predictions, References]):
                 )
             self.module = evaluate.load(name)
 
-    def compute(self, predictions: Predictions, references: References, **kwargs):
+    def compute(self, predictions: List[Any], references: List[Any], **kwargs):
         result = self.module.compute(
             predictions=predictions, references=references, **kwargs
         )

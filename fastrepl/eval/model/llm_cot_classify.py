@@ -4,7 +4,7 @@ from typing import Tuple, Dict, List
 
 from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
-from fastrepl.eval.base import BaseEval
+from fastrepl.eval.base import BaseEvalWithoutReference
 from fastrepl.eval.model.utils import render_labels, mapping_from_labels
 
 
@@ -38,7 +38,7 @@ def final_message_prompt(sample, context=""):
     Text to think about: {{ sample }}"""
 
 
-class LLMChainOfThoughtClassifier(BaseEval):
+class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
     __slots__ = ("model", "mapping", "references", "rg", "system_msg")
 
     def __init__(
