@@ -1,6 +1,7 @@
 from typing import Literal, List, Dict
 import os
 import functools
+import warnings
 
 import backoff
 import openai.error
@@ -106,7 +107,7 @@ def completion(
     messages: List[Dict[str, str]],
     temperature: float = 0,
     logit_bias: Dict[int, int] = {},
-    max_tokens: int = 100,
+    max_tokens: int = 200,
 ) -> ModelResponse:
     try:
         result = litellm_completion(  # pragma: no cover
@@ -117,6 +118,10 @@ def completion(
             max_tokens=max_tokens,
             force_timeout=20,
         )
+        finish_reason = result["choices"][0]["finish_reason"]
+        if finish_reason == "length":
+            warnings.warn("{model} completion truncated due to length")
+
         return result
     except Exception as e:
         handle_llm_exception(e)
