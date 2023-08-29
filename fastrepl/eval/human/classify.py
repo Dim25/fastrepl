@@ -26,9 +26,14 @@ class HumanClassifierRich(BaseEvalWithoutReference):
         self.console = console
         self.stream = stream
 
+    def _shuffle(self):
+        keys = list(self.labels.keys())
+        choices = self.rg.sample(keys, len(keys))
+        return choices
+
     def compute(self, sample: str, context=None) -> str:
         prompt = self.render_prompt(sample=sample)  # TODO: Render descriptions
-        choices = self.rg.sample(list(self.labels.keys()), len(self.labels.keys()))
+        choices = self._shuffle()
 
         if context is None:
             return Prompt.ask(
