@@ -1,7 +1,7 @@
 import pytest
 import inspect
 
-from fastrepl.utils import LocalContext, HistoryDict, ensure, prompt
+from fastrepl.utils import LocalContext, HistoryDict, ensure, prompt, DEBUG
 
 
 class TestLocalContext:
@@ -240,3 +240,11 @@ this is context
 
 Q: hello?"""
         )
+
+
+def test_debug():
+    DEBUG(0)
+    assert DEBUG == 0
+
+    DEBUG(1)
+    assert DEBUG == 1

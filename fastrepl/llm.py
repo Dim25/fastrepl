@@ -7,7 +7,7 @@ import backoff
 import openai.error
 
 import fastrepl
-from fastrepl.utils import getenv
+from fastrepl.utils import getenv, debug
 
 from gptcache import cache
 from gptcache.manager import get_data_manager
@@ -106,6 +106,9 @@ def completion(
     logit_bias: Dict[int, int] = {},
     max_tokens: int = 200,
 ) -> ModelResponse:
+    # TODO: this should be done in eval side
+    debug(messages, before=f"completion({model})")
+
     try:
         result = litellm_completion(  # pragma: no cover
             model=model,

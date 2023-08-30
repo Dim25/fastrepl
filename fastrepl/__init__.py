@@ -10,6 +10,8 @@ from fastrepl.eval import (
     Evaluator,
 )
 
+from fastrepl.utils import DEBUG
+
 from fastrepl.repl import Updatable
 
 from fastrepl.runner import (

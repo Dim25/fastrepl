@@ -14,6 +14,9 @@ from fastrepl.eval import (
     Evaluator,
 )
 
+from fastrepl.utils import DEBUG
+
+
 from fastrepl.runner import (
     LocalRunnerREPL as LocalRunner,
 )

@@ -1,5 +1,7 @@
 from inspect import FrameInfo
 
+from fastrepl.utils import getenv
+
 
 class LocalContext:
     __slots__ = ("_filename", "_function")
@@ -29,3 +31,26 @@ class LocalContext:
     @property
     def function(self):
         return self._function
+
+
+class Variable:
+    def __init__(self, key, value):
+        self.value = getenv(key, value)
+
+    def __call__(self, x):
+        self.value = x
+
+    def __eq__(self, x):
+        return self.value == x
+
+    def __gt__(self, x):
+        return self.value > x
+
+    def __ge__(self, x):
+        return self.value >= x
+
+    def __lt__(self, x):
+        return self.value < x
+
+    def __le__(self, x):
+        return self.value <= x

@@ -3,8 +3,8 @@ from fastrepl.utils.env import loadenv, setenv, getenv
 from fastrepl.utils.iterator import pairwise
 from fastrepl.utils.data_structure import OrderedSet, HistoryDict
 from fastrepl.utils.graph import GraphInfo, build_graph
-from fastrepl.utils.decorator import ensure
-from fastrepl.utils.context import LocalContext
+from fastrepl.utils.ensure import ensure
+from fastrepl.utils.context import LocalContext, Variable
 from fastrepl.utils.prompt import prompt
-
-from rich import print as pprint
+from fastrepl.utils.console import console
+from fastrepl.utils.debug import debug, DEBUG
