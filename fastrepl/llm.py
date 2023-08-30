@@ -26,8 +26,9 @@ cache.init(
 )
 
 import litellm
+import litellm.exceptions
 from litellm import ModelResponse
-from litellm.cache import completion as litellm_completion
+from litellm.gpt_cache import completion as litellm_completion
 
 litellm.telemetry = False  # pragma: no cover
 
@@ -51,11 +52,16 @@ def handle_llm_exception(e: Exception):
         ),
     ):
         raise RetryConstantException from e
+    elif isinstance(e, openai.error.RateLimitError):
+        raise RetryExpoException from e
+    elif isinstance(e, litellm.exceptions.ContextWindowExceededError):
+        # TODO: If model is `gpt-3.5-turbo`, fallback to `gpt-3.5-turbo-16k`
+        raise e
     elif isinstance(
         e,
         (
             openai.error.APIConnectionError,
-            openai.error.InvalidRequestError,  # TODO: context_length_exceeded
+            openai.error.InvalidRequestError,
             openai.error.AuthenticationError,
             openai.error.PermissionError,
             openai.error.InvalidAPIType,
@@ -63,12 +69,8 @@ def handle_llm_exception(e: Exception):
         ),
     ):
         raise e
-    elif isinstance(
-        e,
-        openai.error.RateLimitError,
-    ):
-        raise RetryExpoException from e
     else:
+        warnings.warn(f"got unknown exception: {str(e)}")
         raise e
 
 

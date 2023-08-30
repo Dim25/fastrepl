@@ -1398,20 +1398,24 @@ files = [
 
 [[package]]
 name = "litellm"
-version = "0.1.492"
+version = "0.1.504"
 description = "Library to easily interface with LLM API providers"
 optional = false
-python-versions = ">=3.8,<4.0"
-files = [
-    {file = "litellm-0.1.492-py3-none-any.whl", hash = "sha256:ab46af5b8dadd5835ea5d6609a9cc8f162e4cc181bd4a6cd1c31436e42e35a8d"},
-    {file = "litellm-0.1.492.tar.gz", hash = "sha256:73eec37467635dd4f2fe5cb07838f3b4391a252b40f0413abdd128c54d3e789f"},
-]
+python-versions = "^3.8"
+files = []
+develop = false
 
 [package.dependencies]
-importlib-metadata = ">=6.8.0,<7.0.0"
-openai = ">=0.27.8,<0.28.0"
-python-dotenv = ">=1.0.0,<2.0.0"
-tiktoken = ">=0.4.0,<0.5.0"
+importlib-metadata = "^6.8.0"
+openai = "^0.27.8"
+python-dotenv = "^1.0.0"
+tiktoken = "^0.4.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/BerriAI/litellm.git"
+reference = "4435a231f1fe241af5234598299dbf49d6802f07"
+resolved_reference = "4435a231f1fe241af5234598299dbf49d6802f07"
 
 [[package]]
 name = "markdown-it-py"
@@ -4042,4 +4046,4 @@ tui = ["textual"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "2233d455e68c874442cf8679071b32362d16cfdaa879ff59bd71082cd15c0091"
+content-hash = "1e45faee79a33c1a86ad2910f907d7ac70bd76a76b8cdafde19ca67490015876"
