@@ -35,8 +35,8 @@ cache.init(
 
 import litellm
 import litellm.exceptions
+import litellm.gpt_cache
 from litellm import ModelResponse
-from litellm.gpt_cache import completion as litellm_completion
 
 litellm.telemetry = False  # pragma: no cover
 
@@ -62,14 +62,11 @@ def handle_llm_exception(e: Exception):
         raise RetryConstantException from e
     elif isinstance(e, openai.error.RateLimitError):
         raise RetryExpoException from e
-    elif isinstance(e, litellm.exceptions.ContextWindowExceededError):
-        # TODO: If model is `gpt-3.5-turbo`, fallback to `gpt-3.5-turbo-16k`
-        raise e
     elif isinstance(
         e,
         (
             openai.error.APIConnectionError,
-            openai.error.InvalidRequestError,
+            openai.error.InvalidRequestError,  # NOTE: ContextWindowExceededError will be catched outside
             openai.error.AuthenticationError,
             openai.error.PermissionError,
             openai.error.InvalidAPIType,
@@ -78,20 +75,19 @@ def handle_llm_exception(e: Exception):
     ):
         raise e
     else:
-        warnings.warn(f"got unknown exception: {str(e)}")
+        warnings.warn(f"got unknown exception: {type(e)}")
         raise e
 
 
 SUPPORTED_MODELS = Literal[  # pragma: no cover
-    # https://docs.litellm.ai/docs/completion/supported#openai-chat-completion-models
     "gpt-3.5-turbo",
-    "gpt-3.5-turbo-16k",
+    "gpt-3.5-turbo-0301",
+    "gpt-3.5-turbo-0613",
     "gpt-4",
-    # https://docs.litellm.ai/docs/completion/supported#ai21-models
+    "gpt-4-0314",
+    "gpt-4-0613",
     "j2-ultra",
-    # https://docs.litellm.ai/docs/completion/supported#cohere-models
     "command-nightly",
-    # https://docs.litellm.ai/docs/completion/supported#together-ai-models
     "togethercomputer/llama-2-70b-chat",
 ]
 
@@ -119,22 +115,38 @@ def completion(
     # TODO: this should be done in eval side
     debug(messages, before=f"completion({model})")
 
-    try:
-        result = litellm_completion(  # pragma: no cover
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            logit_bias=logit_bias,
-            max_tokens=max_tokens,
-            force_timeout=20,
-        )
-        finish_reason = result["choices"][0]["finish_reason"]
-        if finish_reason == "length":
-            warnings.warn("{model} completion truncated due to length")
+    LONGER_CONTEXT_MAPPING = {  # pragma: no cover
+        "gpt-3.5-turbo": "gpt-3.5-turbo-16k",
+        "gpt-3.5-turbo-0613": "gpt-3.5-turbo-16k-0613",
+        "gpt-4": "gpt-4-32k",
+        "gpt-4-0314": "gpt-4-32k-0314",
+        "gpt-4-0613": "gpt-4-32k-0613",
+    }
 
-        return result
-    except Exception as e:
-        handle_llm_exception(e)
+    def _completion(fallback=None):
+        try:
+            result = litellm.gpt_cache.completion(  # pragma: no cover
+                model=fallback if fallback is not None else model,
+                messages=messages,
+                temperature=temperature,
+                logit_bias=logit_bias,
+                max_tokens=max_tokens,
+                force_timeout=20,
+            )
+
+            if result["choices"][0]["finish_reason"] == "length":
+                warnings.warn("{model} completion truncated due to length")
+
+            return result
+        except Exception as e:
+            handle_llm_exception(e)
+
+    try:
+        return _completion()
+    except litellm.exceptions.ContextWindowExceededError as e:
+        if LONGER_CONTEXT_MAPPING.get(model) is None:
+            raise e
+        return _completion(fallback=LONGER_CONTEXT_MAPPING[model])
 
 
 @functools.lru_cache(maxsize=None)
