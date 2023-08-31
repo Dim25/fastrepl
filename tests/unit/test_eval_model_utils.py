@@ -1,11 +1,13 @@
 import pytest
 import random
+import warnings
 
 from fastrepl.eval.model.utils import (
     logit_bias_from_labels,
     mappings_from_labels,
     LabelMapping,
     next_mappings_for_consensus,
+    warn_verbosity_bias,
 )
 
 
@@ -167,3 +169,10 @@ class TestNextMappingsForConsensus:
     )
     def test_need(self, mappings, result, expected):
         assert next_mappings_for_consensus(mappings, result) == expected
+
+
+def test_warn_verbosity_bias():
+    with pytest.warns() as record:
+        warn_verbosity_bias(["A" * 9, "B" * 3, "C"])
+
+    assert len(record) == 3

@@ -1,7 +1,7 @@
 import pytest
 import inspect
 
-from fastrepl.utils import LocalContext, HistoryDict, ensure, prompt, DEBUG
+from fastrepl.utils import LocalContext, HistoryDict, ensure, prompt, truncate, DEBUG
 
 
 class TestLocalContext:
@@ -240,6 +240,20 @@ this is context
 
 Q: hello?"""
         )
+
+
+def test_truncate():
+    assert truncate("hello", 10) == "hello"
+    assert truncate("hello", 4) == "h..."
+
+    with pytest.raises(ValueError):
+        truncate("hello", 3)
+
+    with pytest.raises(ValueError):
+        truncate("hello", 2)
+
+    with pytest.raises(ValueError):
+        truncate("hello", 1)
 
 
 def test_debug():

@@ -11,6 +11,7 @@ from fastrepl.eval.model.utils import (
     logit_bias_from_labels,
     mappings_from_labels,
     next_mappings_for_consensus,
+    warn_verbosity_bias,
     LabelMapping,
     PositionDebiasStrategy,
 )
@@ -48,6 +49,8 @@ class LLMClassifier(BaseEvalWithoutReference):
         references: List[Tuple[str, str]] = [],
         position_debias_strategy: PositionDebiasStrategy = "shuffle",
     ) -> None:
+        warn_verbosity_bias(labels.values())
+
         self.labels = labels
         self.global_context = context
         self.model = model

@@ -10,6 +10,7 @@ from fastrepl.eval.model.utils import (
     next_mappings_for_consensus,
     LabelMapping,
     PositionDebiasStrategy,
+    warn_verbosity_bias,
 )
 
 
@@ -55,6 +56,8 @@ class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
         references: List[Tuple[str, str]] = [],
         position_debias_strategy: PositionDebiasStrategy = "shuffle",
     ) -> None:
+        warn_verbosity_bias(labels.values())
+
         self.context = context
         self.labels = labels
         self.model = model

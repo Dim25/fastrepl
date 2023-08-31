@@ -1,6 +1,8 @@
 import random
+import warnings
 from dataclasses import dataclass
-from typing import Optional, Literal, Set, List, Dict
+from typing import Optional, Literal, Iterable, Set, List, Dict
+from itertools import combinations
 
 import sys
 
@@ -9,6 +11,7 @@ if sys.version_info >= (3, 10):
 else:
     from typing_extensions import TypeAlias
 
+from fastrepl.utils import truncate
 from fastrepl.llm import SUPPORTED_MODELS, tokenize
 
 
@@ -61,3 +64,13 @@ def next_mappings_for_consensus(
     ret[i], ret[0] = ret[0], ret[i]
     ret.reverse()
     return ret
+
+
+def warn_verbosity_bias(texts: Iterable[str]):
+    for a, b in combinations(texts, 2):
+        (longer, shorter) = (a, b) if len(a) > len(b) else (b, a)
+        if len(shorter) / len(longer) < 0.5:
+            warnings.warn(
+                f"{truncate(a, 15)!r} and {truncate(b, 15)!r} have a large length difference. "
+                "This may bias the model to prefer the longer one."
+            )
