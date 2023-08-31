@@ -1,4 +1,4 @@
-from typing import Literal, List, Dict
+from typing import Literal, List, Dict, Any
 import os
 import functools
 import warnings
@@ -10,6 +10,7 @@ import fastrepl
 from fastrepl.utils import getenv, debug
 
 from gptcache import cache
+from gptcache.processor.pre import last_content_without_prompt
 from gptcache.manager import get_data_manager
 
 
@@ -17,9 +18,16 @@ def cache_enable_func(*args, **kwargs):
     return fastrepl.LLMCache.enabled()
 
 
+def pre_cache_func(data: Dict[str, Any], **params: Dict[str, Any]) -> Any:
+    last_content_without_prompt_val = last_content_without_prompt(data, **params)
+    cache_key = last_content_without_prompt_val + data["model"]
+    return cache_key
+
+
 dir_name, _ = os.path.split(os.path.abspath(__file__))
 cache.init(
     cache_enable_func=cache_enable_func,
+    pre_func=pre_cache_func,
     data_manager=get_data_manager(
         data_path=f"{dir_name}/.fastrepl.cache", max_size=1000
     ),
