@@ -1,7 +1,13 @@
 import random
 from dataclasses import dataclass
-from typing import Set, List, Dict
+from typing import Optional, Literal, Set, List, Dict
 
+import sys
+
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias
+else:
+    from typing_extensions import TypeAlias
 
 from fastrepl.llm import SUPPORTED_MODELS, tokenize
 
@@ -30,7 +36,7 @@ class LabelMapping:
     description: str
 
 
-def mapping_from_labels(
+def mappings_from_labels(
     labels: Dict[str, str], start=ord("A"), rg=random.Random(42)
 ) -> List[LabelMapping]:
     keys = rg.sample(list(labels.keys()), len(labels))
@@ -38,3 +44,20 @@ def mapping_from_labels(
         LabelMapping(token=chr(start + i), label=label, description=labels[label])
         for i, label in enumerate(keys)
     ]
+
+
+PositionDebiasStrategy: TypeAlias = Literal["shuffle", "consensus"]
+
+
+def next_mappings_for_consensus(
+    mappings: List[LabelMapping], result: LabelMapping
+) -> Optional[List[LabelMapping]]:
+    i = mappings.index(result)
+    mid = len(mappings) // 2
+    if i >= mid:
+        return None
+
+    ret = mappings[:]
+    ret[i], ret[0] = ret[0], ret[i]
+    ret.reverse()
+    return ret

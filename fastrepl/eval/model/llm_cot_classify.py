@@ -1,11 +1,16 @@
 import random
 import warnings
-from typing import Tuple, Dict, List
+from typing import Tuple, Optional, Dict, List
 
 from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEvalWithoutReference
-from fastrepl.eval.model.utils import mapping_from_labels
+from fastrepl.eval.model.utils import (
+    mappings_from_labels,
+    next_mappings_for_consensus,
+    LabelMapping,
+    PositionDebiasStrategy,
+)
 
 
 @prompt
@@ -48,25 +53,31 @@ class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
         model: SUPPORTED_MODELS = "gpt-3.5-turbo",
         rg=random.Random(42),
         references: List[Tuple[str, str]] = [],
+        position_debias_strategy: PositionDebiasStrategy = "shuffle",
     ) -> None:
         self.context = context
         self.labels = labels
         self.model = model
         self.rg = rg
         self.references = references
+        self.position_debias_strategy: PositionDebiasStrategy = position_debias_strategy
 
     def _shuffle(self):
-        mapping = mapping_from_labels(self.labels, rg=self.rg)
+        mappings = mappings_from_labels(self.labels, rg=self.rg)
         references = self.rg.sample(self.references, len(self.references))
-        return mapping, references
+        return mappings, references
 
-    def compute(self, sample: str, context="") -> str:
-        mapping, references = self._shuffle()
-
+    def _compute(
+        self,
+        sample: str,
+        context: str,
+        mappings: List[LabelMapping],
+        references: List[Tuple[str, str]],
+    ) -> Optional[LabelMapping]:
         instruction = system_prompt(
             context=self.context,
-            labels="\n".join(f"{m.token}: {m.description}" for m in mapping),
-            label_keys=", ".join(m.token for m in mapping),
+            labels="\n".join(f"{m.token}: {m.description}" for m in mappings),
+            label_keys=", ".join(m.token for m in mappings),
         )
 
         messages = [{"role": "system", "content": instruction}]
@@ -84,12 +95,33 @@ class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
         )["choices"][0]["message"]["content"]
         # fmt: on
 
-        for m in mapping:
+        for m in mappings:
             if m.token == result[-1]:
-                return m.label
+                return m
 
         warnings.warn(f"classification result not in mapping: {result!r}")
-        return "UNKNOWN"
+        return None
+
+    def compute(self, sample: str, context="") -> Optional[str]:
+        references = self.rg.sample(self.references, len(self.references))
+        mappings = mappings_from_labels(self.labels, rg=self.rg)
+
+        result1 = self._compute(sample, context, mappings, references)
+        if result1 is None:
+            return None
+
+        if self.position_debias_strategy == "shuffle":
+            return result1.label
+
+        next_mappings = next_mappings_for_consensus(mappings, result1)
+        if next_mappings is None:
+            return result1.label
+
+        result2 = self._compute(sample, context, next_mappings, references)
+        if result2 is None:
+            return None
+
+        return result1.label if result1.label == result2.label else None
 
     def is_interactive(self) -> bool:
         return False
