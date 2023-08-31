@@ -76,7 +76,7 @@ jobs:
           script: |
             const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const success = '${{ job.status }}' === 'success';
-            const body = `${success ? '🚀 Preview deployed: ${{ steps.publish.outputs.url }}' : 'Failed to deploy preview ❌\n\n${url}'}`;
+            const body = `${success ? '🚀 Preview deployed: ${{ steps.publish.outputs.url }}' : 'Failed to deploy preview ❌'}`;
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
