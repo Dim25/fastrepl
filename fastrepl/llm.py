@@ -125,8 +125,10 @@ def completion(
 
     def _completion(fallback=None):
         try:
+            maybe_fallback = fallback if fallback is not None else model
+
             result = litellm.gpt_cache.completion(  # pragma: no cover
-                model=fallback if fallback is not None else model,
+                model=maybe_fallback,
                 messages=messages,
                 temperature=temperature,
                 logit_bias=logit_bias,
@@ -135,7 +137,7 @@ def completion(
             )
 
             if result["choices"][0]["finish_reason"] == "length":
-                warnings.warn("{model} completion truncated due to length")
+                warnings.warn(f"{maybe_fallback} completion truncated due to length")
 
             return result
         except Exception as e:
