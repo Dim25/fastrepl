@@ -8,8 +8,8 @@ from fastrepl.eval.base import BaseEvalWithoutReference
 
 @prompt
 def system_prompt(labels, context):
-    """If user gave you the text, do step by step thinking that is needed to classify the given
-    Use less than 50 words.
+    """If user gave you the text, do step-by-step thinking that is needed to classify the given text.
+    Use less than 50 words and maximun 3 steps.
 
     These are the labels that will be used later to classify the text:
     {{labels}}
@@ -27,8 +27,6 @@ def final_message_prompt(sample, context=""):
 
 
 class LLMChainOfThought(BaseEvalWithoutReference):
-    __slots__ = ("model", "references", "rg", "system_msg")
-
     def __init__(
         self,
         context: str,
@@ -37,7 +35,7 @@ class LLMChainOfThought(BaseEvalWithoutReference):
         rg=random.Random(42),
         references: List[Tuple[str, str]] = [],
     ) -> None:
-        self.context = context
+        self.global_context = context
         self.labels = labels
         self.model = model
         self.rg = rg
@@ -51,7 +49,7 @@ class LLMChainOfThought(BaseEvalWithoutReference):
         references = self._shuffle()
 
         instruction = system_prompt(
-            context=context,
+            context=self.global_context,
             labels="\n".join(f"{k}: {v}" for k, v in self.labels.items()),
         )
 

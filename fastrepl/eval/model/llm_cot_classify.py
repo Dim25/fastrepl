@@ -45,8 +45,6 @@ def final_message_prompt(sample, context=""):
 
 
 class LLMChainOfThoughtClassifier(BaseEvalWithoutReference):
-    __slots__ = ("model", "references", "rg", "system_msg")
-
     def __init__(
         self,
         context: str,

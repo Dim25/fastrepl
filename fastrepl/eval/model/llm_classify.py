@@ -38,8 +38,6 @@ def final_message_prompt(sample, context=""):
 
 
 class LLMClassifier(BaseEvalWithoutReference):
-    __slots__ = ("model", "mapping", "rg", "references", "system")
-
     def __init__(
         self,
         labels: Dict[str, str],

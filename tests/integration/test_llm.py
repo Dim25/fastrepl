@@ -55,18 +55,18 @@ class TestTokenize:
 
 
 def test_gpt_cache():
-    fastrepl.LLMCache.enable()
-    assert fastrepl.LLMCache.enabled() == True
+    fastrepl.LLMCache.disable()
+    assert not fastrepl.LLMCache.enabled()
 
     result1 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
     result2 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
     assert not result1.get("gptcache")
-    assert result2.get("gptcache")
+    assert not result2.get("gptcache")
 
-    fastrepl.LLMCache.disable()
-    assert fastrepl.LLMCache.enabled() == False
+    fastrepl.LLMCache.enable()
+    assert fastrepl.LLMCache.enabled()
 
     result3 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
     result4 = completion("gpt-3.5-turbo", [{"role": "user", "content": "hi"}])
-    assert not result1.get("gptcache")
-    assert not result1.get("gptcache")
+    assert result3.get("gptcache")
+    assert result4.get("gptcache")

@@ -3,8 +3,17 @@ from typing import Optional, List
 import pytest
 import _pytest.terminal
 
+from fastrepl.utils import getenv
 
 run_url: Optional[str] = None
+
+
+def set_proxy():
+    import litellm
+
+    # NOTE: This will be provided in Github App
+    api_base = getenv("LITELLM_PROXY_API_BASE", "")
+    litellm.api_base = api_base if api_base != "" else None
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -13,7 +22,7 @@ def pytest_addoption(parser: pytest.Parser):
         "--fastrepl",
         action="store_true",
         default=False,
-        help="Enable experimental fastrepl testing",
+        help="Enable experimental fastrepl evaluation runner",
     )
 
 
@@ -24,7 +33,7 @@ def pytest_configure(config: pytest.Config):
 
 def pytest_sessionstart(session: pytest.Session):
     if session.config.getoption("--fastrepl"):
-        print("Initializing fastrepl session")
+        set_proxy()
 
 
 def pytest_sessionfinish(session: pytest.Session):
@@ -34,25 +43,7 @@ def pytest_sessionfinish(session: pytest.Session):
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: List[pytest.Item]):
-    """
-    If --fastrepl is specified, we will run all tests marked with fastrepl and skip the rest.
-    If --fastrepl is not specified, we will skip all tests marked with fastrepl and run the rest.
-    """
-    if config.getoption("--fastrepl"):
-        for item in items:
-            for marker in item.iter_markers():
-                if marker.name == "fastrepl":
-                    # TODO: We can do some interesting stuffs here
-                    # item.obj = fastrepl.test(item.obj)
-                    pass
-                else:
-                    item.add_marker(
-                        pytest.mark.skip(
-                            "--fastrepl is specified, skipping tests without fastrepl marker"
-                        )
-                    )
-
-    else:
+    if not config.getoption("--fastrepl"):
         for item in items:
             for marker in item.iter_markers():
                 if marker.name == "fastrepl":

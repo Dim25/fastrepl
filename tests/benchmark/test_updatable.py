@@ -4,12 +4,12 @@ import fastrepl.repl as fastrepl
 
 @pytest.fixture
 def enable_interactive(monkeypatch):
-    monkeypatch.setenv("FASTREPL_INTERACTIVE", 1)
+    monkeypatch.setenv("FASTREPL_INTERACTIVE", "1")
 
 
 @pytest.fixture
 def disable_interactive(monkeypatch):
-    monkeypatch.setenv("FASTREPL_INTERACTIVE", 0)
+    monkeypatch.setenv("FASTREPL_INTERACTIVE", "0")
 
 
 def fn_without_updatable():
