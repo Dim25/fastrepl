@@ -38,6 +38,7 @@ python-dotenv = "^1.0.0"
 html2text = "^2020.1.16"
 nbconvert = "^7.7.3"
 ipykernel = "^6.25.1"
+pre-commit = "^3.3.3"
 
 [tool.coverage.run]
 omit = ["**/__init__.py"]
