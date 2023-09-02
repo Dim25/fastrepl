@@ -2,6 +2,7 @@ import pytest
 from datasets import Dataset
 
 import fastrepl
+from fastrepl.utils import getenv
 
 
 def _mapper(label):
@@ -11,6 +12,14 @@ def _mapper(label):
         return 0
     else:
         raise ValueError("Invalid label")
+
+
+@pytest.mark.fastrepl
+def test_api_base():
+    import litellm
+
+    assert getenv("LITELLM_PROXY_API_BASE", "") != ""
+    assert litellm.api_base is not None
 
 
 class TestClassifier:
