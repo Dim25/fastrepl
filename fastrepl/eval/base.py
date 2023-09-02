@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Optional, Any, List
 from abc import ABC, abstractmethod
 
 
@@ -10,9 +10,5 @@ class BaseEvalWithReference(ABC):
 
 class BaseEvalWithoutReference(ABC):
     @abstractmethod
-    def compute(self, prediction: str, context: str) -> Optional[str]:
-        ...
-
-    @abstractmethod
-    def is_interactive(self) -> bool:
+    def compute(self, prediction: str, context: Optional[str]) -> Optional[str]:
         ...

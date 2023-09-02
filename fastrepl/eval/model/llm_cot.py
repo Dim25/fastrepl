@@ -69,6 +69,3 @@ class LLMChainOfThought(BaseEvalWithoutReference):
         # fmt: on
 
         return result
-
-    def is_interactive(self) -> bool:
-        return False

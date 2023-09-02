@@ -4,9 +4,9 @@ from fastrepl.cache import LLMCache
 from fastrepl.eval import (
     load_metric,
     LLMChainOfThought,
-    LLMClassifier,
-    LLMChainOfThoughtClassifier,
     HumanClassifierRich,
+    LLMGradingHead,
+    LLMClassificationHead,
     Evaluator,
 )
 

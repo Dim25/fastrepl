@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
-import threading
 from multiprocessing.pool import ThreadPool
 from datasets import Dataset
 from rich.progress import Progress
@@ -29,10 +29,8 @@ class LocalRunner(BaseRunner):
         self._dataset = dataset
         self._input_feature = input_feature
         self._output_feature = output_feature
-        # NOTE: We can't run interactive evaluators in parallel
-        self._interactive_semaphore = threading.Semaphore(1)
 
-    def _run_eval(self, sample: str) -> str:
+    def _run_eval(self, sample: str) -> Optional[str]:
         return self._evaluator.run(sample)
 
     def run(self) -> Dataset:
@@ -51,23 +49,7 @@ class LocalRunner(BaseRunner):
 
 
 class LocalRunnerREPL(LocalRunner):
-    def __init__(
-        self,
-        evaluator: fastrepl.Evaluator,
-        dataset: Dataset,
-        input_feature: str = "input",
-        output_feature: str = "prediction",
-    ) -> None:
-        super().__init__(evaluator, dataset, input_feature, output_feature)
-        # NOTE: We can't run interactive evaluators in parallel
-        self._interactive_semaphore = threading.Semaphore(1)
-
-    def _run_eval(self, sample: str) -> str:
-        if self._evaluator.is_interactive():
-            with self._interactive_semaphore:
-                return self._evaluator.run(sample)
-        else:
-            return self._evaluator.run(sample)
+    pass
 
 
 class RemoteRunner(BaseRunner):

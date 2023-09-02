@@ -8,9 +8,6 @@ class MockEval(BaseEvalWithoutReference):
     def compute(self, sample: str, context="") -> str:
         return context + sample + "0"
 
-    def is_interactive(self) -> bool:
-        return False
-
 
 class TestEvaluator:
     def test_empty_pipeline(self):

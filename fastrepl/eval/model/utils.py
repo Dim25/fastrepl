@@ -1,7 +1,7 @@
 import random
 import warnings
 from dataclasses import dataclass
-from typing import Optional, Literal, Iterable, Set, List, Dict
+from typing import Optional, Union, Literal, Iterable, List, Dict
 from itertools import combinations
 
 import sys
@@ -12,22 +12,24 @@ else:
     from typing_extensions import TypeAlias
 
 from fastrepl.utils import truncate
-from fastrepl.llm import SUPPORTED_MODELS, tokenize
+import fastrepl.llm as llm
 
 
-def logit_bias_from_labels(model: SUPPORTED_MODELS, labels: Set[str]) -> Dict[int, int]:
-    def get_token_id(label: str) -> int:
-        ids = tokenize(model, label)
+def logit_bias_from(
+    model: llm.SUPPORTED_MODELS, strings: Iterable[str]
+) -> Dict[int, int]:
+    def _get_token_id(s: str) -> int:
+        ids = llm.tokenize(model, s)
         if len(ids) != 1:
-            raise ValueError(f"{label!r} is not a single token in {model!r}")
+            raise ValueError(f"{s!r} is not a single token in {model!r}")
         return ids[0]
 
     if model == "command-nightly":
         COHERE_MAX = 10
-        return {get_token_id(k): COHERE_MAX for k in labels}
+        return {_get_token_id(s): COHERE_MAX for s in strings}
     elif model in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]:
         OPENAI_MAX = 100
-        return {get_token_id(k): OPENAI_MAX for k in labels}
+        return {_get_token_id(s): OPENAI_MAX for s in strings}
     else:
         return {}
 
@@ -53,15 +55,17 @@ PositionDebiasStrategy: TypeAlias = Literal["shuffle", "consensus"]
 
 
 def next_mappings_for_consensus(
-    mappings: List[LabelMapping], result: LabelMapping
+    mappings: List[LabelMapping], result: Union[LabelMapping, str]
 ) -> Optional[List[LabelMapping]]:
-    i = mappings.index(result)
+    token = result.token if isinstance(result, LabelMapping) else result
+    index = next(i for i, v in enumerate(mappings) if v.token == token)
+
     mid = len(mappings) // 2
-    if i >= mid:
+    if index >= mid:
         return None
 
     ret = mappings[:]
-    ret[i], ret[0] = ret[0], ret[i]
+    ret[index], ret[0] = ret[0], ret[index]
     ret.reverse()
     return ret
 

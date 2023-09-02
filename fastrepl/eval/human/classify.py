@@ -50,6 +50,3 @@ class HumanClassifierRich(BaseEvalWithoutReference):
                 console=self.console,
                 stream=self.stream,
             )
-
-    def is_interactive(self) -> bool:
-        return True

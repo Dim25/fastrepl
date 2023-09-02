@@ -20,7 +20,7 @@ tasks:
   todo:ci: grep -r 'TODO!' ./fastrepl && exit 1 || exit 0
 
   fmt: poetry run black fastrepl tests
-  lint: poetry run mypy fastrepl tests
+  lint: poetry run mypy fastrepl tests --enable-incomplete-feature=Unpack
   clean: rm -f .local/*.gv .local/*.png
 
   metric:add: 
