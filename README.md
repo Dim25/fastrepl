@@ -1,7 +1,8 @@
-# ⚡♾️ FastREPL
-Fast `Run-Eval-Polish Loop` for LLM Application. Local-first and Framework agnostic.
-
 **Note: This project is still in early development stage.**
+
+# ⚡♾️ FastREPL
+Fast `Run-Eval-Polish Loop` for LLM App.
+
 
 ## Installation
 ```bash
