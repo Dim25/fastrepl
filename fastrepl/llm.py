@@ -81,7 +81,7 @@ def handle_llm_exception(e: Exception):
     ):
         raise e
     else:
-        warn(UnknownLLMExceptionWarning, context=type(e))
+        warn(UnknownLLMExceptionWarning, context=str(type(e)))
         raise e
 
 
@@ -118,9 +118,6 @@ def completion(
     logit_bias: Dict[int, int] = {},
     max_tokens: int = 200,
 ) -> ModelResponse:
-    # TODO: this should be done in eval side
-    debug(messages, before=f"completion({model})")
-
     LONGER_CONTEXT_MAPPING = {  # pragma: no cover
         "gpt-3.5-turbo": "gpt-3.5-turbo-16k",
         "gpt-3.5-turbo-0613": "gpt-3.5-turbo-16k-0613",
@@ -142,8 +139,13 @@ def completion(
                 force_timeout=20,
             )
 
+            content = result["choices"][0]["message"]["content"]
+
             if result["choices"][0]["finish_reason"] == "length":
-                warn(CompletionTruncatedWarning)
+                warn(CompletionTruncatedWarning, context=content)
+
+            # TODO: debug call should be done in eval side
+            debug({"llm_input": messages, "llm_output": content})
 
             return result
         except Exception as e:
