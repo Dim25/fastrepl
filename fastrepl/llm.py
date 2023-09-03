@@ -7,6 +7,12 @@ import backoff
 import openai.error
 
 import fastrepl
+from fastrepl.warnings import (
+    warn,
+    CompletionTruncatedWarning,
+    UnknownLLMExceptionWarning,
+)
+from fastrepl.errors import TokenizeNotImplementedError
 from fastrepl.utils import getenv, debug
 
 from gptcache import cache
@@ -75,7 +81,7 @@ def handle_llm_exception(e: Exception):
     ):
         raise e
     else:
-        warnings.warn(f"got unknown exception: {type(e)}")
+        warn(UnknownLLMExceptionWarning, context=type(e))
         raise e
 
 
@@ -137,7 +143,7 @@ def completion(
             )
 
             if result["choices"][0]["finish_reason"] == "length":
-                warnings.warn(f"{maybe_fallback} completion truncated due to length")
+                warn(CompletionTruncatedWarning)
 
             return result
         except Exception as e:
@@ -165,5 +171,4 @@ def tokenize(model: SUPPORTED_MODELS, text: str) -> List[int]:
         enc = tiktoken.get_encoding("cl100k_base")
         return enc.encode(text)
 
-    # https://docs.ai21.com/reference/tokenize-ref
-    raise NotImplementedError(f"tokenize not implemented for {model!r}")
+    raise TokenizeNotImplementedError(model)

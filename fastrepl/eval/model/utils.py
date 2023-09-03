@@ -1,5 +1,4 @@
 import random
-import warnings
 from dataclasses import dataclass
 from typing import Optional, Union, Literal, Iterable, List, Dict
 from itertools import combinations
@@ -70,11 +69,12 @@ def next_mappings_for_consensus(
     return ret
 
 
-def warn_verbosity_bias(texts: Iterable[str]):
+def check_length_inbalance(texts: Iterable[str]) -> bool:
+    RATIO = 0.5
+
     for a, b in combinations(texts, 2):
         (longer, shorter) = (a, b) if len(a) > len(b) else (b, a)
-        if len(shorter) / len(longer) < 0.5:
-            warnings.warn(
-                f"{truncate(a, 15)!r} and {truncate(b, 15)!r} have a large length difference. "
-                "This may bias the model to prefer the longer one."
-            )
+        if len(shorter) / len(longer) < RATIO:
+            return True
+
+    return False

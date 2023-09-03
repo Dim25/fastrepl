@@ -1,15 +1,15 @@
 import pytest
 import random
-import warnings
 
 import fastrepl.llm
 from fastrepl.eval.model.utils import (
     logit_bias_from,
     mappings_from_labels,
-    LabelMapping,
     next_mappings_for_consensus,
-    warn_verbosity_bias,
+    LabelMapping,
 )
+
+from fastrepl.eval.model.utils import check_length_inbalance
 
 
 @pytest.fixture(autouse=True)
@@ -172,8 +172,6 @@ class TestNextMappingsForConsensus:
         assert next_mappings_for_consensus(mappings, result) == expected
 
 
-def test_warn_verbosity_bias():
-    with pytest.warns() as record:
-        warn_verbosity_bias(["A" * 9, "B" * 3, "C"])
-
-    assert len(record) == 3
+def test_check_length_inbalance():
+    assert check_length_inbalance(["A" * 9, "B" * 3, "C"])
+    assert not check_length_inbalance(["A" * 4, "B" * 3, "C" * 2])

@@ -57,6 +57,7 @@ exclude_also = [
 exclude = [".venv"]
 explicit_package_bases = "True"
 ignore_missing_imports = "True"
+enable_incomplete_feature = "Unpack"
 
 [tool.pytest.ini_options]
 markers = ["todo"]

@@ -53,3 +53,4 @@ No. **FastREPL** will help you to evaluate and polish your LLM based app.
 
    miscellaneous/caching.md
    miscellaneous/observability.md
+   miscellaneous/warnings_and_errors.md

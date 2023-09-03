@@ -2,6 +2,7 @@ import pytest
 
 import fastrepl
 from fastrepl.llm import completion, tokenize
+from fastrepl.errors import TokenizeNotImplementedError
 
 
 class TestTokenize:
@@ -63,6 +64,8 @@ class TestTokenize:
 
     def test_ai21(self):
         with pytest.raises(NotImplementedError):
+            tokenize("j2-ultra", "A")
+        with pytest.raises(TokenizeNotImplementedError):
             tokenize("j2-ultra", "A")
 
 

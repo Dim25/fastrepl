@@ -8,11 +8,12 @@ from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
 from fastrepl.eval.base import BaseEvalWithoutReference
 
+from fastrepl.warnings import warn, VerbosityBiasWarning
 from fastrepl.eval.model.utils import (
     logit_bias_from,
     mappings_from_labels,
     next_mappings_for_consensus,
-    warn_verbosity_bias,
+    check_length_inbalance,
     PositionDebiasStrategy,
 )
 
@@ -35,13 +36,13 @@ class LLMEvaluationHead(BaseEvalWithoutReference):
 
     @abstractmethod
     def _system_message(
-        self, sample: str, global_context: str, local_context: str
+        self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         ...
 
     @abstractmethod
     def _final_message(
-        self, sample: str, global_context: str, local_context: str
+        self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         ...
 
@@ -86,7 +87,8 @@ class LLMClassificationHead(LLMEvaluationHead):
         position_debias_strategy: PositionDebiasStrategy = "shuffle",
         **kwargs: Unpack[LLMEvaluationHeadParams],
     ) -> None:
-        warn_verbosity_bias(labels.values())
+        if check_length_inbalance(labels.values()):
+            warn(VerbosityBiasWarning)
 
         self.labels = labels
         self.mapping = mappings_from_labels(labels)
@@ -96,7 +98,7 @@ class LLMClassificationHead(LLMEvaluationHead):
         super().__init__(**kwargs)
 
     def _system_message(
-        self, sample: str, global_context: str, local_context: str
+        self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
         def p(context, labels, label_keys):
@@ -129,11 +131,11 @@ class LLMClassificationHead(LLMEvaluationHead):
         )
 
     def _final_message(
-        self, sample: str, global_context: str, local_context: str
+        self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
         def p(sample, context):
-            """{% if context is not None %}
+            """{% if context is not none %}
             Info about the text: {{ context }}
             {% endif %}
             Text to classify: {{ sample }}"""
@@ -143,7 +145,7 @@ class LLMClassificationHead(LLMEvaluationHead):
             "content": p(sample, local_context),
         }
 
-    def _compute(self, sample: str, context="") -> Optional[str]:
+    def _compute(self, sample: str, context: Optional[str]) -> Optional[str]:
         if self.position_debias_strategy == "shuffle":
             self.mapping = mappings_from_labels(self.labels, rg=self.rg)
             return super().compute(sample, context)
@@ -183,7 +185,7 @@ class LLMGradingHead(LLMEvaluationHead):
         super().__init__(**kwargs)
 
     def _system_message(
-        self, sample: str, global_context: str, local_context: str
+        self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
         def p(context):
@@ -193,11 +195,11 @@ class LLMGradingHead(LLMEvaluationHead):
         return {"role": "system", "content": p(global_context)}
 
     def _final_message(
-        self, sample: str, global_context: str, local_context: str
+        self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
         def p(sample, context):
-            """{% if context is not None %}
+            """{% if context is not none %}
             Info about the text: {{ context }}
             {% endif %}
             Text to grade: {{ sample }}"""
