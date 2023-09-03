@@ -19,7 +19,4 @@ from fastrepl.runner import (
     RemoteRunner,
 )
 
-from fastrepl.errors import (
-    InvalidStatusError,
-    EmptyGraphError,
-)
+from fastrepl.errors import *

@@ -8,3 +8,11 @@ class InvalidStatusError(Error):
 
 class EmptyGraphError(Error):
     pass
+
+
+class NonePredictionError(Error):
+    pass
+
+
+class NoneReferenceError(Error):
+    pass

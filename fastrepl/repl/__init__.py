@@ -21,7 +21,4 @@ from fastrepl.runner import (
     LocalRunnerREPL as LocalRunner,
 )
 
-from fastrepl.errors import (
-    InvalidStatusError,
-    EmptyGraphError,
-)
+from fastrepl.errors import *

@@ -1,6 +1,7 @@
 from typing import List, Any, Literal, get_args
 import evaluate
 
+from fastrepl import NonePredictionError, NoneReferenceError
 from fastrepl.eval.base import BaseEvalWithReference
 
 HUGGINGFACE_BUILTIN_METRICS = Literal[
@@ -93,7 +94,15 @@ class HuggingfaceMetric(BaseEvalWithReference):
                 )
             self.module = evaluate.load(name)
 
+    def _validate(self, predictions: List[Any], references: List[Any]) -> None:
+        if any(v is None for v in predictions):
+            raise NonePredictionError
+        if any(v is None for v in references):
+            raise NoneReferenceError
+
     def compute(self, predictions: List[Any], references: List[Any], **kwargs):
+        self._validate(predictions, references)
+
         result = self.module.compute(
             predictions=predictions, references=references, **kwargs
         )
