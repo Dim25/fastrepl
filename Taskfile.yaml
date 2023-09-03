@@ -3,6 +3,7 @@ version: '3'
 tasks:
   install:
     cmds:
+      - poetry lock --check
       - POETRY_VIRTUALENVS_IN_PROJECT=true poetry install --no-cache --no-interaction
       - poetry run pre-commit install
   
