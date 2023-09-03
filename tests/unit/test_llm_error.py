@@ -58,7 +58,9 @@ class TestContextFallback:
             if kwargs.get("model") == "gpt-3.5-turbo":
                 raise litellm.exceptions.ContextWindowExceededError("", "", "")
             elif kwargs.get("model") == "gpt-3.5-turbo-16k":
-                return {"choices": [{"finish_reason": "stop"}]}
+                return {
+                    "choices": [{"finish_reason": "stop", "message": {"content": ""}}]
+                }
             else:
                 raise NotImplementedError
 
