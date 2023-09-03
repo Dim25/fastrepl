@@ -1,5 +1,7 @@
 from typing import Dict
 
+# pip install textual
+
 
 # Note: This eval will not work on Notebook.
 class HumanClassifierTexual:
