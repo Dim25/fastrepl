@@ -1,10 +1,12 @@
 import pytest
+import warnings
 
 from typing import get_args
 from evaluate import list_evaluation_modules
 import numpy as np
 
 import fastrepl
+from fastrepl.errors import NoneReferenceError
 from fastrepl.eval.metric.huggingface import (
     HUGGINGFACE_BUILTIN_METRICS,
     HUGGINGFACE_FASTREPL_METRICS,
@@ -19,6 +21,37 @@ class TestHuggingfaceMetric:
         assert huggingface_builtin_metrics == list_evaluation_modules(
             module_type="metric", include_community=False
         )
+
+    def test_warning(self):
+        m = fastrepl.load_metric("f1")
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            result = m.compute(
+                predictions=[0, 1],
+                references=[1, 1],
+            )
+            assert result["f1"] == pytest.approx(0.66, abs=1e-2)
+
+        with pytest.warns():
+            result = m.compute(
+                predictions=[0, None],
+                references=[1, 1],
+            )
+            assert result["f1"] == 0
+
+    def test_error(self):
+        m = fastrepl.load_metric("f1")
+        m.compute(
+            predictions=[0, 1],
+            references=[0, 1],
+        )
+
+        with pytest.raises(NoneReferenceError):
+            m.compute(
+                predictions=[0, 1],
+                references=[0, None],
+            )
 
     @pytest.mark.parametrize(
         "name",

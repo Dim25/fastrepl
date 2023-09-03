@@ -96,17 +96,18 @@ class HuggingfaceMetric(BaseEvalWithReference):
                 )
             self.module = evaluate.load(name)
 
-    def _validate(self, predictions: List[Any], references: List[Any]) -> None:
-        if any(v is None for v in predictions):
-            warn(IncompletePredictionWarning)
+    def compute(self, predictions: List[Any], references: List[Any], **kwargs):
         if any(v is None for v in references):
             raise NoneReferenceError
 
-    def compute(self, predictions: List[Any], references: List[Any], **kwargs):
-        self._validate(predictions, references)
+        ps, rs = [], []
+        for i, (prediction, reference) in enumerate(zip(predictions, references)):
+            if prediction is None:
+                warn(IncompletePredictionWarning, context=f"{i}th sample skipped")
+                continue
+            ps.append(prediction)
+            rs.append(reference)
 
-        result = self.module.compute(
-            predictions=predictions, references=references, **kwargs
-        )
+        result = self.module.compute(predictions=ps, references=rs, **kwargs)
         # Huggingface has some inconsistencies in their API. Fix here if needed.
         return result
