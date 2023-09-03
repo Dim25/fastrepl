@@ -2,7 +2,7 @@
 It is very important to **properly handle bias throughout the evaluation process.** This section will cover the different types of bias that can occur and how `fastrepl` can help you deal with them.
 
 ## Model Bias
-> `TL;DR` Use different models for generation and evaluation. Compare multiple models if possible.
+> `TL;DR` Compare multiple models while doing evaluation
 ### Problem
 Different model has different bias. For example, [GPT-4 favors itself with a 10% higher win rate while Claude-v1 favors itself with a 25% higher win rate.](https://arxiv.org/pdf/2306.05685.pdf) Although the author did express some uncertainty:
 
@@ -12,11 +12,33 @@ Different model has different bias. For example, [GPT-4 favors itself with a 10%
 `fastrepl` uses [`litellm`](https://github.com/BerriAI/litellm) under the hood, which allows you to use any model you want.
 
 ```python
-eval = fastrepl.LLMChainOfThoughtClassifier(
+eval = fastrepl.LLMClassificationHead(
     model="gpt-3.5-turbo", # can be any model that litellm supports
     ...
 )
 ```
+
+## Name Bias
+> `TL;DR` Instead of the label names that the user provides, `fastrepl` will use an auto-generated mapping.
+
+### Problem
+[Claude-v1 also shows a name bias which makes it favors "Assistant A"](https://arxiv.org/pdf/2306.05685.pdf). This means that somehow, how we name a label can impact the evaluation results.
+
+### Solution
+When you are using `LLMClassificationHead`, `fastrepl` automatically generate single-token mapping for each label.
+
+```python
+eval = fastrepl.LLMClassificationHead(
+    labels={
+        "LABEL_1": "DESCRIPTION_1", # We ask LLM to output `A` for this
+        "LABEL_2": "DESCRIPTION_2", # We ask LLM to output `B` for this
+        # Of course, final result will be form of `LABEL_1`, not `A`.
+    }
+    ...
+)
+```
+
+In the example above, the label name, such as `LABEL_1`, is provided solely for the user's convenience and is ignored by fastrepl. Instead, it maps them to `A` and `B` internally. Admittedly, this just removes the potential impact of the label name that the user provided, but it does have some advantages that make our evaluation more reliable, as we can use `logit_bias` to guide the LLM. In-depth research about the effectiveness of debiasing will be done in the future.
 
 ## Position Bias
 > `TL;DR` Order of samples matters. Shuffle them or use consensus mechanism `fastrepl` provides.
