@@ -18,5 +18,3 @@ from fastrepl.runner import (
     LocalRunner,
     RemoteRunner,
 )
-
-from fastrepl.errors import *

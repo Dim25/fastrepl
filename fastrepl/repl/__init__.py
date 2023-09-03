@@ -20,5 +20,3 @@ from fastrepl.utils import DEBUG
 from fastrepl.runner import (
     LocalRunnerREPL as LocalRunner,
 )
-
-from fastrepl.errors import *

@@ -10,6 +10,10 @@ class EmptyGraphError(Error):
     pass
 
 
+class EmptyPipelineError(Error):
+    pass
+
+
 class NonePredictionError(Error):
     pass
 

@@ -59,7 +59,7 @@ class LLMEvaluationHead(BaseEvalWithoutReference):
             )
         )
 
-    def compute(self, sample: str, context="") -> Optional[str]:
+    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
         messages = [
             self._system_message(sample, self.global_context, context),
             *self._reference_messages(
@@ -132,18 +132,15 @@ class LLMClassificationHead(LLMEvaluationHead):
         self, sample: str, global_context: str, local_context: str
     ) -> Dict[str, str]:
         @prompt
-        def p(context, sample):
-            """{% if context != '' %}
+        def p(sample, context):
+            """{% if context is not None %}
             Info about the text: {{ context }}
             {% endif %}
             Text to classify: {{ sample }}"""
 
         return {
             "role": "user",
-            "content": p(
-                context=local_context,
-                sample=sample,
-            ),
+            "content": p(sample, local_context),
         }
 
     def _compute(self, sample: str, context="") -> Optional[str]:
@@ -167,7 +164,7 @@ class LLMClassificationHead(LLMEvaluationHead):
 
             return initial_result if initial_result == next_result else None
 
-    def compute(self, sample: str, context="") -> Optional[str]:
+    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
         token = self._compute(sample, context)
         if token is None:
             return None
@@ -200,7 +197,7 @@ class LLMGradingHead(LLMEvaluationHead):
     ) -> Dict[str, str]:
         @prompt
         def p(sample, context):
-            """{% if context != '' %}
+            """{% if context is not None %}
             Info about the text: {{ context }}
             {% endif %}
             Text to grade: {{ sample }}"""

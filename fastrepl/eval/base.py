@@ -1,10 +1,12 @@
-from typing import Optional, Any, List
+from typing import Optional, Dict, List, Any
 from abc import ABC, abstractmethod
 
 
 class BaseEvalWithReference(ABC):
     @abstractmethod
-    def compute(self, predictions: List[Any], references: List[Any], **kwargs):
+    def compute(
+        self, predictions: List[Any], references: List[Any], **kwargs
+    ) -> Dict[str, Any]:
         ...
 
 

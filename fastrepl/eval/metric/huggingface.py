@@ -1,7 +1,7 @@
 from typing import List, Any, Literal, get_args
 import evaluate
 
-from fastrepl import NonePredictionError, NoneReferenceError
+from fastrepl.errors import NonePredictionError, NoneReferenceError
 from fastrepl.eval.base import BaseEvalWithReference
 
 HUGGINGFACE_BUILTIN_METRICS = Literal[
