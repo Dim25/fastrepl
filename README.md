@@ -1,4 +1,4 @@
-**Note: This project is still in early development stage.**
+**This project is still in the early development stage. Have questions? [Let's chat!](https://calendly.com/yujonglee/fastrepl)**
 
 # ⚡♾️ FastREPL
 Fast `Run-Eval-Polish Loop` for LLM App.
