@@ -1,4 +1,6 @@
+import functools
 from typing import overload, get_args
+
 
 from fastrepl.eval.base import BaseMetaEvalNode
 from fastrepl.eval.metric.huggingface import (
@@ -29,6 +31,7 @@ def load_metric(
     ...
 
 
+@functools.lru_cache()
 def load_metric(name: str, **kwargs) -> BaseMetaEvalNode:
     if name in get_args(HUGGINGFACE_BUILTIN_METRICS):
         return HuggingfaceMetric(name)

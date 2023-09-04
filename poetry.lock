@@ -202,6 +202,21 @@ files = [
 ]
 
 [[package]]
+name = "baserun"
+version = "0.5.2"
+description = "Tools for testing, debugging, and evaluating LLM features."
+optional = false
+python-versions = ">=3.7.1"
+files = [
+    {file = "baserun-0.5.2-py3-none-any.whl", hash = "sha256:bf30c9d7fb64b168553e7432dec3bfd694d702ca32a7a36abfe4b3b233e1ddf9"},
+    {file = "baserun-0.5.2.tar.gz", hash = "sha256:a45c07c3ec0a6953f37e3280b95bfd0426d8ba3762f482231a6b17585767b14a"},
+]
+
+[package.dependencies]
+openai = ">=0.27.2"
+requests = ">=2.31.0"
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.12.2"
 description = "Screen-scraping library"
@@ -4058,4 +4073,4 @@ tui = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "7151e45199e9b5ee16d8eb10d888d6b92849719d213dd297b3190b22c0b674da"
+content-hash = "6d248b340d83dcb3d17d726b1046d61d3046fe49051cdaa5fdec2a4e9cfcee11"
