@@ -4,6 +4,8 @@
 
 ### VerbosityBias
 
+### InvalidPrediction
+
 ### IncompletePrediction
 
 ### CompletionTruncated

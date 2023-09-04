@@ -2,11 +2,11 @@ import functools
 from typing import Optional, List
 
 from fastrepl.errors import EmptyPipelineError
-from fastrepl.eval.base import BaseEvalWithoutReference
+from fastrepl.eval.base import BaseEvalNode
 
 
 class Evaluator:
-    def __init__(self, pipeline: List[BaseEvalWithoutReference]) -> None:
+    def __init__(self, pipeline: List[BaseEvalNode]) -> None:
         if len(pipeline) == 0:
             raise EmptyPipelineError
         self.pipeline = pipeline

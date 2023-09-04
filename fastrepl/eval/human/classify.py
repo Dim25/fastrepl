@@ -5,10 +5,10 @@ import random
 from rich.prompt import Prompt
 from rich.console import Console
 
-from fastrepl.eval.base import BaseEvalWithoutReference
+from fastrepl.eval.base import BaseEvalNode
 
 
-class HumanClassifierRich(BaseEvalWithoutReference):
+class HumanClassifierRich(BaseEvalNode):
     def __init__(
         self,
         labels: Dict[str, str],

@@ -3,10 +3,10 @@ from typing import Optional
 
 from fastrepl import Evaluator
 from fastrepl.errors import EmptyPipelineError
-from fastrepl.eval.base import BaseEvalWithoutReference
+from fastrepl.eval.base import BaseEvalNode
 
 
-class MockEval(BaseEvalWithoutReference):
+class MockEval(BaseEvalNode):
     def compute(self, sample: str, context: Optional[str] = None) -> str:
         return ("" if context is None else context) + sample + "0"
 

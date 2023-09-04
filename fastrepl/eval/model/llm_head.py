@@ -1,14 +1,16 @@
 import random
+import functools
 import itertools
+
 from abc import abstractmethod
 from typing import Optional, Tuple, Iterable, TypedDict, List, Dict
 from typing_extensions import Unpack, NotRequired
 
 from fastrepl.utils import prompt
 from fastrepl.llm import completion, SUPPORTED_MODELS
-from fastrepl.eval.base import BaseEvalWithoutReference
+from fastrepl.eval.base import BaseEvalNode
 
-from fastrepl.warnings import warn, VerbosityBiasWarning
+from fastrepl.warnings import warn, VerbosityBiasWarning, InvalidPredictionWarning
 from fastrepl.eval.model.utils import (
     logit_bias_from,
     mappings_from_labels,
@@ -26,7 +28,7 @@ class LLMEvaluationHeadParams(TypedDict):
     references: NotRequired[List[Tuple[str, str]]]
 
 
-class LLMEvaluationHead(BaseEvalWithoutReference):
+class LLMEvaluationHead(BaseEvalNode):
     def __init__(self, **kwargs: Unpack[LLMEvaluationHeadParams]) -> None:
         self.global_context = kwargs["context"]
         self.options = kwargs["options"]
@@ -35,18 +37,18 @@ class LLMEvaluationHead(BaseEvalWithoutReference):
         self.references = kwargs.get("references", [])
 
     @abstractmethod
-    def _system_message(
+    def system_message(
         self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         ...
 
     @abstractmethod
-    def _final_message(
+    def final_message(
         self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         ...
 
-    def _reference_messages(
+    def reference_messages(
         self,
         references: List[Tuple[str, str]],
     ) -> List[Dict[str, str]]:
@@ -60,24 +62,38 @@ class LLMEvaluationHead(BaseEvalWithoutReference):
             )
         )
 
-    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
-        messages = [
-            self._system_message(sample, self.global_context, context),
-            *self._reference_messages(
-                self.rg.sample(self.references, len(self.references))
-            ),
-            self._final_message(sample, self.global_context, context),
-        ]
+    def messages(
+        self, sample: str, context: Optional[str] = None
+    ) -> List[Dict[str, str]]:
+        system_message = self.system_message(sample, self.global_context, context)
+        reference_messages = self.reference_messages(
+            self.rg.sample(self.references, len(self.references))
+        )
+        final_message = self.final_message(sample, self.global_context, context)
 
-        result = completion(
+        return [system_message, *reference_messages, final_message]
+
+    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
+        prediction = completion(
             model=self.model,
-            messages=messages,
+            messages=self.messages(sample, context),
             max_tokens=1,  # NOTE: when using logit_bias for classification, max_tokens should be 1
             logit_bias=logit_bias_from(self.model, [str(i) for i in self.options]),
         )["choices"][0]["message"]["content"]
 
-        # NOTE: Some LLM provider does not have logit_bias option
-        return result if result in self.options else None
+        # We can get 'A' instead of 'A', which is still a single token.
+        prediction = prediction.strip()
+
+        # NOTE: Some LLM provider does not have logit_bias option.
+        # Also, for Cohere, max logit_bias value(=10) is not enough to force the model.
+        if prediction not in self.options:
+            warn(
+                InvalidPredictionWarning,
+                context=f"{prediction!r} not in {self.options}.",
+            )
+            return None
+
+        return prediction
 
 
 class LLMClassificationHead(LLMEvaluationHead):
@@ -97,7 +113,7 @@ class LLMClassificationHead(LLMEvaluationHead):
         kwargs.update({"options": [m.token for m in self.mapping]})
         super().__init__(**kwargs)
 
-    def _system_message(
+    def system_message(
         self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
@@ -120,17 +136,19 @@ class LLMClassificationHead(LLMEvaluationHead):
             ),
         }
 
-    def _reference_messages(
+    def reference_messages(
         self, references: List[Tuple[str, str]]
     ) -> List[Dict[str, str]]:
-        def label2token(label: str) -> str:
-            return next(m.token for m in self.mapping if m.label == label)
+        def label2token(text: str) -> str:
+            return functools.reduce(
+                lambda t, m: t.replace(m.label, m.token), self.mapping, text
+            )
 
-        return super()._reference_messages(
+        return super().reference_messages(
             [(input, label2token(output)) for input, output in references]
         )
 
-    def _final_message(
+    def final_message(
         self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
@@ -184,7 +202,7 @@ class LLMGradingHead(LLMEvaluationHead):
         kwargs.update({"options": [str(i) for i in range(number_from, number_to + 1)]})
         super().__init__(**kwargs)
 
-    def _system_message(
+    def system_message(
         self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
@@ -194,7 +212,7 @@ class LLMGradingHead(LLMEvaluationHead):
 
         return {"role": "system", "content": p(global_context)}
 
-    def _final_message(
+    def final_message(
         self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt

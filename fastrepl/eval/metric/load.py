@@ -1,6 +1,6 @@
 from typing import overload, get_args
 
-from fastrepl.eval.base import BaseEvalWithReference
+from fastrepl.eval.base import BaseMetaEvalNode
 from fastrepl.eval.metric.huggingface import (
     HUGGINGFACE_BUILTIN_METRICS,
     HUGGINGFACE_FASTREPL_METRICS,
@@ -29,7 +29,7 @@ def load_metric(
     ...
 
 
-def load_metric(name: str, **kwargs) -> BaseEvalWithReference:
+def load_metric(name: str, **kwargs) -> BaseMetaEvalNode:
     if name in get_args(HUGGINGFACE_BUILTIN_METRICS):
         return HuggingfaceMetric(name)
     elif name in get_args(HUGGINGFACE_FASTREPL_METRICS):

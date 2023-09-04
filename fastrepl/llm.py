@@ -161,13 +161,13 @@ def completion(
 
 @functools.lru_cache(maxsize=None)
 def tokenize(model: SUPPORTED_MODELS, text: str) -> List[int]:
-    if model == "command-nightly":
+    if model.startswith("command"):
         import cohere
 
         co = cohere.Client(getenv("COHERE_API_KEY", ""))
         response = co.tokenize(text=text, model="command")
         return response.tokens
-    elif model in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]:
+    elif model.startswith("gpt"):
         import tiktoken
 
         enc = tiktoken.get_encoding("cl100k_base")

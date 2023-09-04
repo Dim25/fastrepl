@@ -4,7 +4,7 @@ import evaluate
 
 from fastrepl.warnings import warn, IncompletePredictionWarning
 from fastrepl.errors import NoneReferenceError
-from fastrepl.eval.base import BaseEvalWithReference
+from fastrepl.eval.base import BaseMetaEvalNode
 
 HUGGINGFACE_BUILTIN_METRICS = Literal[
     "precision",
@@ -65,7 +65,7 @@ HUGGINGFACE_BUILTIN_METRICS = Literal[
 HUGGINGFACE_FASTREPL_METRICS = Literal["mean_reciprocal_rank", "mean_average_precision"]
 
 
-class HuggingfaceMetric(BaseEvalWithReference):
+class HuggingfaceMetric(BaseMetaEvalNode):
     __slots__ = ("name", "module")
 
     def __init__(self, name: str) -> None:

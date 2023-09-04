@@ -42,6 +42,12 @@ class VerbosityBiasWarning(Warning):
         )
 
 
+class InvalidPredictionWarning(Warning):
+    @staticmethod
+    def doc_url() -> str:
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#invalidprediction"
+
+
 class IncompletePredictionWarning(Warning):
     @staticmethod
     def doc_url() -> str:

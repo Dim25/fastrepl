@@ -2,7 +2,7 @@ from typing import Optional, Dict, List, Any
 from abc import ABC, abstractmethod
 
 
-class BaseEvalWithReference(ABC):
+class BaseMetaEvalNode(ABC):
     @abstractmethod
     def compute(
         self, predictions: List[Any], references: List[Any], **kwargs
@@ -10,7 +10,7 @@ class BaseEvalWithReference(ABC):
         ...
 
 
-class BaseEvalWithoutReference(ABC):
+class BaseEvalNode(ABC):
     @abstractmethod
     def compute(self, prediction: str, context: Optional[str]) -> Optional[str]:
         ...
