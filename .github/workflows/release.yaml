@@ -23,11 +23,11 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Install poetry 1.5.1
+      - name: Install poetry 1.6.1
         run: |
           python -m ensurepip
           python -m pip install --upgrade pip
-          python -m pip install poetry==1.5.1
+          python -m pip install poetry==1.6.1
 
       - name: Install dependencies
         run: task install

@@ -15,7 +15,7 @@ jobs:
         python-version:
           - "3.11"
         poetry-version:
-          - "1.5.1"
+          - "1.6.1"
 
     steps:
       - name: Get PR branch
