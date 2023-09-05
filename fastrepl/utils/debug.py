@@ -6,7 +6,7 @@ from fastrepl.utils import Variable, console  # type: ignore[no-redef]
 DEBUG = Variable("DEBUG", 0)
 
 
-def debug(input) -> None:
+def debug(input) -> None:  # pragma: no cover
     if DEBUG < 1:
         return None
 

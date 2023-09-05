@@ -37,38 +37,34 @@ class Warning(UserWarning):
 class VerbosityBiasWarning(Warning):
     @staticmethod
     def doc_url() -> str:
-        return (
-            "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#verbositybias"
-        )
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#verbositybias"  # pragma: no cover
 
 
 class InvalidPredictionWarning(Warning):
     @staticmethod
     def doc_url() -> str:
-        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#invalidprediction"
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#invalidprediction"  # pragma: no cover
 
 
 class IncompletePredictionWarning(Warning):
     @staticmethod
     def doc_url() -> str:
-        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#incompleteprediction"
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#incompleteprediction"  # pragma: no cover
 
 
 class CompletionTruncatedWarning(Warning):
     @staticmethod
     def doc_url() -> str:
-        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#completiontruncated"
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#completiontruncated"  # pragma: no cover
 
 
 class UnknownLLMExceptionWarning(Warning):
     @staticmethod
     def doc_url() -> str:
-        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#unknownllmexception"
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#unknownllmexception"  # pragma: no cover
 
 
 class FloatGradingWarning(Warning):
     @staticmethod
     def doc_url() -> str:
-        return (
-            "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#floatgrading"
-        )
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#floatgrading"  # pragma: no cover

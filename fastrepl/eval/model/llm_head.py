@@ -112,7 +112,7 @@ class LLMClassificationHead(LLMEvaluationHead):
         position_debias_strategy: PositionDebiasStrategy = "shuffle",
         **kwargs: Unpack[LLMEvaluationHeadParams],
     ) -> None:
-        if check_length_inbalance(labels.values()):
+        if check_length_inbalance(labels.values()):  # pragma: no cover
             warn(VerbosityBiasWarning)
 
         self.labels = labels

@@ -17,28 +17,24 @@ class Error(Exception, ABC):
 
 class InvalidStatusError(Error):
     def doc_url(self) -> str:
-        return "https://docs.fastrepl.com"
+        return "https://docs.fastrepl.com"  # pragma: no cover
 
 
 class EmptyGraphError(Error):
     def doc_url(self) -> str:
-        return "https://docs.fastrepl.com"
+        return "https://docs.fastrepl.com"  # pragma: no cover
 
 
 class EmptyPipelineError(Error):
     def doc_url(self) -> str:
-        return (
-            "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#emptypipeline"
-        )
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#emptypipeline"  # pragma: no cover
 
 
 class NoneReferenceError(Error):
     def doc_url(self) -> str:
-        return (
-            "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#nonereference"
-        )
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#nonereference"  # pragma: no cover
 
 
 class TokenizeNotImplementedError(Error, NotImplementedError):
     def doc_url(self) -> str:
-        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#tokenizenotimplemented"
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#tokenizenotimplemented"  # pragma: no cover
