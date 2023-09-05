@@ -12,6 +12,8 @@
 
 ### UnknownLLMException
 
+### FloatGrading
+
 ## Errors
 
 ### EmptyPipeline

@@ -6,11 +6,16 @@ from abc import abstractmethod
 from typing import Optional, Tuple, Iterable, TypedDict, List, Dict
 from typing_extensions import Unpack, NotRequired
 
-from fastrepl.utils import prompt
-from fastrepl.llm import completion, SUPPORTED_MODELS
+import fastrepl.llm as llm
+from fastrepl.utils import prompt, number
 from fastrepl.eval.base import BaseEvalNode
 
-from fastrepl.warnings import warn, VerbosityBiasWarning, InvalidPredictionWarning
+from fastrepl.warnings import (
+    warn,
+    VerbosityBiasWarning,
+    InvalidPredictionWarning,
+    FloatGradingWarning,
+)
 from fastrepl.eval.model.utils import (
     logit_bias_from,
     mappings_from_labels,
@@ -23,7 +28,7 @@ from fastrepl.eval.model.utils import (
 class LLMEvaluationHeadParams(TypedDict):
     context: str
     options: Iterable[str]
-    model: NotRequired[SUPPORTED_MODELS]
+    model: NotRequired[llm.SUPPORTED_MODELS]
     rg: NotRequired[random.Random]
     references: NotRequired[List[Tuple[str, str]]]
 
@@ -73,27 +78,31 @@ class LLMEvaluationHead(BaseEvalNode):
 
         return [system_message, *reference_messages, final_message]
 
-    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
-        prediction = completion(
+    def completion(self, sample: str, context: Optional[str] = None) -> Optional[str]:
+        return llm.completion(
             model=self.model,
             messages=self.messages(sample, context),
             max_tokens=1,  # NOTE: when using logit_bias for classification, max_tokens should be 1
             logit_bias=logit_bias_from(self.model, [str(i) for i in self.options]),
         )["choices"][0]["message"]["content"]
 
-        # We can get 'A' instead of 'A', which is still a single token.
-        prediction = prediction.strip()
-
-        # NOTE: Some LLM provider does not have logit_bias option.
-        # Also, for Cohere, max logit_bias value(=10) is not enough to force the model.
-        if prediction not in self.options:
-            warn(
-                InvalidPredictionWarning,
-                context=f"{prediction!r} not in {self.options}.",
-            )
+    # NOTE: It is safe to return NONE, since metric will skip prediction-reference pair if prediction is NONE
+    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
+        result = self.completion(sample, context)
+        if result is None:
             return None
 
-        return prediction
+        # we can get ' A' instead of 'A', which is still a single token.
+        result = result.strip()
+
+        # NOTE: Although we use max_token=1 and logit_bias, we still can get something different.
+        # This is because 1. some LLM provider does not have logit_bias option. 2
+        # 2. for Cohere, max logit_bias value(=10) is not enough to force the model. (Not sure why.)
+        if result not in self.options:
+            warn(InvalidPredictionWarning, context=f"{result!r} not in {self.options}.")
+            return None
+
+        return result
 
 
 class LLMClassificationHead(LLMEvaluationHead):
@@ -199,6 +208,7 @@ class LLMGradingHead(LLMEvaluationHead):
         number_to: int,
         **kwargs: Unpack[LLMEvaluationHeadParams],
     ) -> None:
+        self.number_from, self.number_to = number_from, number_to
         kwargs.update({"options": [str(i) for i in range(number_from, number_to + 1)]})
         super().__init__(**kwargs)
 
@@ -223,3 +233,20 @@ class LLMGradingHead(LLMEvaluationHead):
             Text to grade: {{ sample }}"""
 
         return {"role": "user", "content": p(sample, local_context)}
+
+    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
+        result = number(self.completion(sample, context))
+        if result is None:
+            return None
+
+        if result < self.number_from or result > self.number_to:
+            warn(
+                InvalidPredictionWarning,
+                context=f"{result!r} is not in range [{self.number_from}, {self.number_to}].",
+            )
+            return None
+
+        if type(result) is float:
+            warn(FloatGradingWarning, context=f"{result!r} is not an integer.")
+
+        return str(result)

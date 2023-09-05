@@ -1,7 +1,7 @@
 from typing import Optional, Dict
 
+import fastrepl.llm as llm
 from fastrepl.utils import prompt
-from fastrepl.llm import completion
 from fastrepl.eval.model import LLMClassificationHead, LLMGradingHead
 from fastrepl.warnings import warn, InvalidPredictionWarning
 
@@ -47,24 +47,12 @@ class LLMClassificationHeadCOT(LLMClassificationHead):
 
         return {"role": "user", "content": p(sample, local_context)}
 
-    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
-        # fmt: off
-        result = completion(
-            model=self.model,
-            messages=self.messages(sample, context)
+    def completion(self, sample: str, context: Optional[str] = None) -> Optional[str]:
+        prediction = llm.completion(
+            model=self.model, messages=self.messages(sample, context)
         )["choices"][0]["message"]["content"]
-        # fmt: on
 
-        prediction = result.split("### Result")[-1].strip()
-
-        if prediction not in self.options:
-            warn(
-                InvalidPredictionWarning,
-                context=f"{prediction!r} not in {self.options}. full: {result}",
-            )
-            return None
-
-        return next(m.label for m in self.mapping if m.token == prediction)
+        return prediction.split("### Result")[-1].strip()
 
 
 class LLMGradingHeadCOT(LLMGradingHead):
@@ -99,21 +87,9 @@ class LLMGradingHeadCOT(LLMGradingHead):
 
         return {"role": "user", "content": p(sample, local_context)}
 
-    def compute(self, sample: str, context: Optional[str] = None) -> Optional[str]:
-        # fmt: off
-        result = completion(
-            model=self.model,
-            messages=self.messages(sample, context)
+    def completion(self, sample: str, context: Optional[str] = None) -> Optional[str]:
+        result = llm.completion(
+            model=self.model, messages=self.messages(sample, context)
         )["choices"][0]["message"]["content"]
-        # fmt: on
 
-        prediction = result.split("### Result")[-1].strip()
-
-        if prediction not in self.options:
-            warn(
-                InvalidPredictionWarning,
-                context=f"{prediction!r} not in {self.options}. full: {result}",
-            )
-            return None
-
-        return prediction
+        return result.split("### Result")[-1].strip()

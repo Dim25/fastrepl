@@ -45,7 +45,9 @@ class TestLLMClassificationHeadBasic:
         )
 
         mock_completion(["D"])
-        assert eval.compute("") is None
+
+        with pytest.warns():
+            assert eval.compute("") is None
 
 
 class TestClassificationHeadShuffle:
@@ -72,7 +74,6 @@ class TestClassificationHeadConsensus:
         )
 
         mock_completion([eval.mapping[0].token])
-
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             with pytest.raises(StopIteration):
@@ -120,8 +121,31 @@ class TestLLMGradingHead:
     @pytest.mark.parametrize(
         "return_value, number_from, number_to",
         [
+            ("1.1", 1, 3),
+            ("2.2", 1, 3),
+        ],
+    )
+    def test_return_result_with_warnings(
+        self, mock_completion, return_value, number_from, number_to
+    ):
+        eval = fastrepl.LLMGradingHead(
+            context="test",
+            number_from=number_from,
+            number_to=number_to,
+        )
+
+        mock_completion([return_value])
+
+        with pytest.warns():
+            assert eval.compute("") == return_value
+
+    @pytest.mark.parametrize(
+        "return_value, number_from, number_to",
+        [
+            ("-1", 1, 3),
             ("0", 1, 3),
             ("6", 1, 5),
+            ("4.1", 1, 3),
         ],
     )
     def test_return_none(self, mock_completion, return_value, number_from, number_to):
@@ -132,4 +156,6 @@ class TestLLMGradingHead:
         )
 
         mock_completion([return_value])
-        assert eval.compute("") is None
+
+        with pytest.warns():
+            assert eval.compute("") is None

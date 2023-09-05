@@ -1,7 +1,15 @@
 import pytest
 import inspect
 
-from fastrepl.utils import LocalContext, HistoryDict, ensure, prompt, truncate, DEBUG
+from fastrepl.utils import (
+    LocalContext,
+    HistoryDict,
+    ensure,
+    prompt,
+    truncate,
+    number,
+    DEBUG,
+)
 
 
 class TestLocalContext:
@@ -254,6 +262,24 @@ def test_truncate():
 
     with pytest.raises(ValueError):
         truncate("hello", 1)
+
+
+@pytest.mark.parametrize(
+    "input, expected",
+    [
+        (1, 1),
+        (1.1, 1.1),
+        ("1", 1),
+        ("1 ", 1),
+        ("1.1", 1.1),
+        ("61", 61),
+        ("61a ", None),
+        ("one", None),
+        (None, None),
+    ],
+)
+def test_number(input, expected):
+    assert number(input) == expected
 
 
 def test_debug():
