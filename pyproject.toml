@@ -36,7 +36,7 @@ black = "^23.7.0"
 python-dotenv = "^1.0.0"
 html2text = "^2020.1.16"
 nbconvert = "^7.7.3"
-ipykernel = "^6.25.1"
+ipykernel = "^6.25.2"
 pre-commit = "^3.4.0"
 baserun = "^0.5.2"
 
