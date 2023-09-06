@@ -21,6 +21,8 @@ Predicted grade is float, not integer.
 
 ### EmptyPipeline
 
+### EmptyPredictions
+
 ### NoneReference
 
 ### TokenizeNotImplemented

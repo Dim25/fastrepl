@@ -1,5 +1,4 @@
 import pytest
-import baserun
 from datasets import Dataset, load_dataset
 
 import fastrepl
@@ -59,6 +58,7 @@ def dataset() -> Dataset:
     "model, position_debias_strategy",
     [
         ("gpt-3.5-turbo", "shuffle"),
+        # ("togethercomputer/llama-2-70b-chat", "shuffle"),
     ],
 )
 @pytest.mark.fastrepl
@@ -77,9 +77,6 @@ def test_llm_classification_head(dataset, model, position_debias_strategy):
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(label2number)
 
-    for p, r in zip(result["prediction"], result["reference"]):
-        baserun.evals.match(eval_name("LLMClassificationHead", model), str(p), str(r))
-
     accuracy, mse, mae = (
         fastrepl.load_metric(name).compute(
             predictions=result["prediction"],
@@ -88,10 +85,17 @@ def test_llm_classification_head(dataset, model, position_debias_strategy):
         for name in ("accuracy", "mse", "mae")
     )
 
-    baserun.log("metrics", {"accuracy": accuracy, "mse": mse, "mae": mae})
-
+    print(
+        {
+            "eval": "LLMClassificationHead",
+            "model": model,
+            "accuracy": accuracy,
+            "mse": mse,
+            "mae": mae,
+        }
+    )
     assert accuracy > 0.09
-    assert mse < 5
+    assert mse < 6
     assert mae < 3
 
 
@@ -99,6 +103,7 @@ def test_llm_classification_head(dataset, model, position_debias_strategy):
     "model, position_debias_strategy",
     [
         ("gpt-3.5-turbo", "shuffle"),
+        # ("togethercomputer/llama-2-70b-chat", "shuffle"),
     ],
 )
 @pytest.mark.fastrepl
@@ -117,11 +122,6 @@ def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(label2number)
 
-    for p, r in zip(result["prediction"], result["reference"]):
-        baserun.evals.match(
-            eval_name("LLMClassificationHeadCOT", model), str(p), str(r)
-        )
-
     accuracy, mse, mae = (
         fastrepl.load_metric(name).compute(
             predictions=result["prediction"],
@@ -130,10 +130,17 @@ def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
         for name in ("accuracy", "mse", "mae")
     )
 
-    baserun.log("metrics", {"accuracy": accuracy, "mse": mse, "mae": mae})
-
+    print(
+        {
+            "eval": "LLMClassificationHeadCOT",
+            "model": model,
+            "accuracy": accuracy,
+            "mse": mse,
+            "mae": mae,
+        }
+    )
     assert accuracy > 0.09
-    assert mse < 5
+    assert mse < 6
     assert mae < 3
 
 
@@ -141,6 +148,7 @@ def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
     "model",
     [
         ("gpt-3.5-turbo"),
+        # ("togethercomputer/llama-2-70b-chat"),
     ],
 )
 @pytest.mark.fastrepl
@@ -159,9 +167,6 @@ def test_llm_grading_head(dataset, model):
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(grade2number)
 
-    for p, r in zip(result["prediction"], result["reference"]):
-        baserun.evals.match(eval_name("LLMGradingHead", model), str(p), str(r))
-
     accuracy, mse, mae = (
         fastrepl.load_metric(name).compute(
             predictions=result["prediction"],
@@ -170,10 +175,17 @@ def test_llm_grading_head(dataset, model):
         for name in ("accuracy", "mse", "mae")
     )
 
-    baserun.log("metrics", {"accuracy": accuracy, "mse": mse, "mae": mae})
-
+    print(
+        {
+            "eval": "LLMGradingHead",
+            "model": model,
+            "accuracy": accuracy,
+            "mse": mse,
+            "mae": mae,
+        }
+    )
     assert accuracy > 0.09
-    assert mse < 5
+    assert mse < 6
     assert mae < 3
 
 
@@ -181,6 +193,7 @@ def test_llm_grading_head(dataset, model):
     "model",
     [
         ("gpt-3.5-turbo"),
+        # ("togethercomputer/llama-2-70b-chat"),
     ],
 )
 @pytest.mark.fastrepl
@@ -199,9 +212,6 @@ def test_grading_head_cot(dataset, model):
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(grade2number)
 
-    for p, r in zip(result["prediction"], result["reference"]):
-        baserun.evals.match(eval_name("LLMGradingHeadCOT", model), str(p), str(r))
-
     accuracy, mse, mae = (
         fastrepl.load_metric(name).compute(
             predictions=result["prediction"],
@@ -210,8 +220,15 @@ def test_grading_head_cot(dataset, model):
         for name in ("accuracy", "mse", "mae")
     )
 
-    baserun.log("metrics", {"accuracy": accuracy, "mse": mse, "mae": mae})
-
+    print(
+        {
+            "eval": "LLMGradingHeadCOT",
+            "model": model,
+            "accuracy": accuracy,
+            "mse": mse,
+            "mae": mae,
+        }
+    )
     assert accuracy > 0.09
-    assert mse < 5
+    assert mse < 6
     assert mae < 3

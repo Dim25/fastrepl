@@ -3,7 +3,7 @@ from typing import List, Any, Literal, get_args
 import evaluate
 
 from fastrepl.warnings import warn, IncompletePredictionWarning
-from fastrepl.errors import NoneReferenceError
+from fastrepl.errors import NoneReferenceError, EmptyPredictionsError
 from fastrepl.eval.base import BaseMetaEvalNode
 
 HUGGINGFACE_BUILTIN_METRICS = Literal[
@@ -107,6 +107,10 @@ class HuggingfaceMetric(BaseMetaEvalNode):
                 continue
             ps.append(prediction)
             rs.append(reference)
+
+        assert len(ps) == len(rs)
+        if len(ps) == 0:
+            raise EmptyPredictionsError
 
         result = self.module.compute(predictions=ps, references=rs, **kwargs)
         # Huggingface has some inconsistencies in their API. Fix here if needed.

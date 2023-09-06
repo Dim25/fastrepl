@@ -48,11 +48,18 @@ class LLMClassificationHeadCOT(LLMClassificationHead):
         return {"role": "user", "content": p(sample, local_context)}
 
     def completion(self, sample: str, context: Optional[str] = None) -> Optional[str]:
-        prediction = llm.completion(
+        prediction: str = llm.completion(
             model=self.model, messages=self.messages(sample, context)
         )["choices"][0]["message"]["content"]
+        prediction = prediction.split("### Result")[-1].strip()
 
-        return prediction.split("### Result")[-1].strip()
+        # TODO
+        for m in self.mapping:
+            for delimiter in [":", "\n"]:
+                if prediction.startswith(f"{m.token}{delimiter}"):
+                    return m.token
+
+        return prediction
 
 
 class LLMGradingHeadCOT(LLMGradingHead):

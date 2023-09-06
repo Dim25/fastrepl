@@ -217,7 +217,7 @@ class LLMGradingHead(LLMEvaluationHead):
     ) -> Dict[str, str]:
         @prompt
         def p(context):
-            """You are master of grading who can grade any text according to the user's instructions.
+            """You are master of grading who can grade any text according to the user's instructions. Only output a single integer.
             {{context}}"""
 
         return {"role": "system", "content": p(global_context)}

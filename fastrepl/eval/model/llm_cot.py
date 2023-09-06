@@ -25,7 +25,7 @@ class LLMChainOfThought(BaseEvalNode):
         def p(labels, context):
             """If user gave you the text, do step-by-step thinking about it within 3 sentences.
 
-            When do step-by-step thinking, you must consider the following:
+            When doing step-by-step thinking, you must consider the following:
             {{ context }}"""
 
         return {"role": "system", "content": p(global_context)}

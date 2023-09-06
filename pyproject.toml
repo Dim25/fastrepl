@@ -38,7 +38,6 @@ html2text = "^2020.1.16"
 nbconvert = "^7.7.3"
 ipykernel = "^6.25.2"
 pre-commit = "^3.4.0"
-baserun = "^0.5.2"
 
 [tool.coverage.run]
 omit = ["**/__init__.py"]
@@ -61,9 +60,6 @@ enable_incomplete_feature = "Unpack"
 
 [tool.pytest.ini_options]
 markers = ["todo"]
-
-[tool.poetry.extras]
-tui = ["textual"]
 
 [build-system]
 requires = ["poetry-core"]
