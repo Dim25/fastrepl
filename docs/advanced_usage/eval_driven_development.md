@@ -1,2 +1,0 @@
-# Eval Driven Development
-EDD

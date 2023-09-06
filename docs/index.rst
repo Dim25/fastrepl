@@ -5,7 +5,7 @@ FastREPL enables simple `Run-Eval-Polish Loop` for LLM Applications.
 
 🚀 Why FastREPL?
 ***************************
-Lots of LLM applications are built, but almost **none** of them are tested in a reliable way.
+Lots of LLM applications are built, but almost **none** of them are tested in reliable way.
 
 ♾️ How can FastREPL help?
 ***************************
@@ -13,7 +13,7 @@ Lots of LLM applications are built, but almost **none** of them are tested in a 
 
 🤔 Is this like LangChain?
 ***************************
-No. **FastREPL** will help you to evaluate and polish your LLM based app.
+No. **FastREPL** is only for evaluation and testing.
 
 
 .. toctree::
@@ -41,8 +41,6 @@ No. **FastREPL** will help you to evaluate and polish your LLM based app.
    :caption: Advanced Usage
    :hidden:
    
-   advanced_usage/eval_domain_shift.md
-   advanced_usage/prompt_engineering.md
    advanced_usage/human_eval.md
    advanced_usage/dealing_with_bias.md
 

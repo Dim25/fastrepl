@@ -6,4 +6,6 @@
 pip install fastrepl
 ```
 
-You can find all releases [here](https://github.com/yujonglee/fastrepl/releases).
+You can find all releases [here](https://pypi.org/project/fastrepl).
+
+## Real-World Example

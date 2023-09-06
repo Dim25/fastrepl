@@ -8,6 +8,8 @@ Different model has different bias. For example, [GPT-4 favors itself with a 10%
 
 > However, they also favor other models and GPT-3.5 does not favor itself. Due to limited data and small differences, our study cannot determine whether the models exhibit a self-enhancement bias. Conducting a controlled study is challenging because we cannot easily rephrase a response to fit the style of another model without changing the quality.
 
+Additionally, this tendency can be observed in [AlpacaEval](https://tatsu-lab.github.io/alpaca_eval/). When the evaluator is `GPT-4`, the ranking is as follows: `Claude 2 > ChatGPT > Claude`. However, when `Claude` serves as the evaluator, the ranking changes to `Claude > Claude 2 > ChatGPT`.
+
 ### Solution
 `fastrepl` uses [`litellm`](https://github.com/BerriAI/litellm) under the hood, which allows you to use any model you want.
 
@@ -43,18 +45,29 @@ In the example above, the label name, such as `LABEL_1`, is provided solely for 
 ## Position Bias
 > `TL;DR` Order of samples matters. Shuffle them or use consensus mechanism `fastrepl` provides.
 ### Problem
-[LLM exhibits a propensity to favor certain positions over others.](https://arxiv.org/pdf/2306.05685.pdf) Mostly, they have bias toward the first.
+Position bias refers to the influence of the order of samples on the result. It is not unique to LLMs and has been observed in human decision-making and other machine learning domains.
+
+We cannot be certain about which position the LLM prefers, as it varies among different LLMs and different prompts. For example, two papers that mention position bias show conflicting results:
+
+> GPT-3.5: Biased toward first: 50.0%, Biased toward second: 1.2% (Table 2)
+>
+> \- [Judging LLM-as-a-judge with MT-Bench and Chatbot Arena](https://arxiv.org/pdf/2306.05685.pdf)
+
+
+> This bias is also present in ChatGPT, which typically favors the second response.
+>
+> \- [Large Language Models are not Fair Evaluators](https://arxiv.org/pdf/2305.17926.pdf)
 
 
 ### Solution
 You can pass eaither `shuffle` or `consensus` to `position_debias_strategy`.
 
 #### Shuffle
-Everything is shuffled per `compute` if possible.
-
+[Label mapping](#name-bias) and order of samples are shuffled per `compute`.
 
 #### Consensus
-`fastrepl` do maximum 2 call per `compute`.
+This is a simplified version of `Balanced Position Calibration`[(Large Language Models are not Fair Evaluators)](https://arxiv.org/pdf/2305.17926.pdf). `fastrepl` performs one additional prediction with the reversed sample ordering if the result of the first prediction was not in the exact middle.
+
 ```python
 eval = fastrepl.LLMChainOfThoughtClassifier(
     position_debias_strategy="consensus" # default="shuffle"
@@ -62,7 +75,17 @@ eval = fastrepl.LLMChainOfThoughtClassifier(
 )
 ```
 
-If two result is not same, `fastrepl` will return `None`. This should be handled using `Human-Eval` later.
+If the two results are not the same, the evaluator will return `None`.
+
+#### Others
+The degree of position bias varies from one situation to another.
+
+1. Position bias is less prominent when the score gap between the two responses becomes larger.
+
+    For detailed results, refer to `Figure 2` of [Large Language Models are not Fair Evaluators](https://arxiv.org/pdf/2305.17926.pdf) and `Table 10` of [Judging LLM-as-a-judge with MT-Bench and Chatbot Arena](https://arxiv.org/pdf/2306.05685.pdf).
+
+2. `Appendix D.1` of [Judging LLM-as-a-judge with MT-Bench and Chatbot Arena](https://arxiv.org/pdf/2306.05685.pdf) displays position bias across different models, prompts, and categories. For instance, position bias is much less prominent in math and coding categories.
+
 
 ## Verbosity Bias
 > `TL;DR` LLM love longer samples. Keep eye on the warnings `fastrepl` gives you.
@@ -83,4 +106,4 @@ eval = fastrepl.LLMChainOfThoughtClassifier(
 )
 ```
 
-Will result `UserWarning` mentioning `This may bias the model to prefer the longer one.`
+This will result [VerbosityBiasWarning](miscellaneous/warnings_and_errors.md#verbositybias).

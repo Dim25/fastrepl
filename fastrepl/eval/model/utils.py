@@ -53,18 +53,17 @@ def mappings_from_labels(
 PositionDebiasStrategy: TypeAlias = Literal["shuffle", "consensus"]
 
 
+# TODO: we can not be sure that every LLM has bias toward the first
 def next_mappings_for_consensus(
     mappings: List[LabelMapping], result: Union[LabelMapping, str]
 ) -> Optional[List[LabelMapping]]:
     token = result.token if isinstance(result, LabelMapping) else result
     index = next(i for i, v in enumerate(mappings) if v.token == token)
 
-    mid = len(mappings) // 2
-    if index >= mid:
+    if len(mappings) % 2 == 1 and len(mappings) // 2 == index:
         return None
 
     ret = mappings[:]
-    ret[index], ret[0] = ret[0], ret[index]
     ret.reverse()
     return ret
 

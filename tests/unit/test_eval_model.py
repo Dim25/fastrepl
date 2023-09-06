@@ -59,21 +59,22 @@ class TestClassificationHeadConsensus:
     def test_no_need_for_consensus(self, mock_completion):
         eval = fastrepl.LLMClassificationHead(
             context="test",
-            labels={"POSITIVE": "this is positive", "NEGATIVE": "this is negative"},
+            labels={ch: ch for ch in "ABC"},
             position_debias_strategy="consensus",
         )
 
-        mock_completion([eval.mapping[-1].token])
+        mock_completion([eval.mapping[3 // 2].token])
         assert eval.compute("") is not None
 
-    def test_triggered_twice(self, mock_completion):
+    @pytest.mark.parametrize("i", [(3 // 2) - 1, (3 // 2) + 1])
+    def test_need_for_consensus(self, mock_completion, i):
         eval = fastrepl.LLMClassificationHead(
             context="test",
-            labels={"POSITIVE": "this is positive", "NEGATIVE": "this is negative"},
+            labels={ch: ch for ch in "ABC"},
             position_debias_strategy="consensus",
         )
 
-        mock_completion([eval.mapping[0].token])
+        mock_completion([eval.mapping[i].token])
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             with pytest.raises(StopIteration):
@@ -82,7 +83,7 @@ class TestClassificationHeadConsensus:
     def test_consensus_success(self, mock_completion):
         eval = fastrepl.LLMClassificationHead(
             context="test",
-            labels={"POSITIVE": "this is positive", "NEGATIVE": "this is negative"},
+            labels={ch: ch for ch in "ABC"},
             position_debias_strategy="consensus",
         )
 
@@ -92,7 +93,7 @@ class TestClassificationHeadConsensus:
     def test_consensus_failed(self, mock_completion):
         eval = fastrepl.LLMClassificationHead(
             context="test",
-            labels={"POSITIVE": "this is positive", "NEGATIVE": "this is negative"},
+            labels={ch: ch for ch in "ABC"},
             position_debias_strategy="consensus",
         )
 

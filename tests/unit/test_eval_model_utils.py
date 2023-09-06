@@ -96,18 +96,11 @@ class TestNextMappingsForConsensus:
         [
             (
                 [
-                    LabelMapping("A", "POSITIVE", "Given text is positive."),
-                    LabelMapping("B", "NEGATIVE", "Given text is negative."),
+                    LabelMapping("A", "NEUTRAL", "Given text is neutral."),
+                    LabelMapping("B", "POSITIVE", "Given text is positive."),
+                    LabelMapping("C", "NEGATIVE", "Given text is negative."),
                 ],
-                LabelMapping("B", "NEGATIVE", "Given text is negative."),
-                None,
-            ),
-            (
-                [
-                    LabelMapping("A", "POSITIVE", "Given text is positive."),
-                    LabelMapping("B", "NEGATIVE", "Given text is negative."),
-                ],
-                "B",
+                LabelMapping("B", "POSITIVE", "Given text is positive."),
                 None,
             ),
             (
@@ -116,7 +109,7 @@ class TestNextMappingsForConsensus:
                     LabelMapping("B", "POSITIVE", "Given text is positive."),
                     LabelMapping("C", "NEGATIVE", "Given text is negative."),
                 ],
-                "C",
+                "B",
                 None,
             ),
         ],
@@ -162,8 +155,23 @@ class TestNextMappingsForConsensus:
                 [
                     LabelMapping("D", "SOMETHING", "Given text is something."),
                     LabelMapping("C", "NEGATIVE", "Given text is negative."),
+                    LabelMapping("B", "POSITIVE", "Given text is positive."),
+                    LabelMapping("A", "NEUTRAL", "Given text is neutral."),
+                ],
+            ),
+            (
+                [
                     LabelMapping("A", "NEUTRAL", "Given text is neutral."),
                     LabelMapping("B", "POSITIVE", "Given text is positive."),
+                    LabelMapping("C", "NEGATIVE", "Given text is negative."),
+                    LabelMapping("D", "SOMETHING", "Given text is something."),
+                ],
+                "C",
+                [
+                    LabelMapping("D", "SOMETHING", "Given text is something."),
+                    LabelMapping("C", "NEGATIVE", "Given text is negative."),
+                    LabelMapping("B", "POSITIVE", "Given text is positive."),
+                    LabelMapping("A", "NEUTRAL", "Given text is neutral."),
                 ],
             ),
         ],
