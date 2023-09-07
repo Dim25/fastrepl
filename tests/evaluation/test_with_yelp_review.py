@@ -81,7 +81,7 @@ def test_llm_classification_head(dataset, model, position_debias_strategy):
         for name in ("accuracy", "mse", "mae")
     )
 
-    print(
+    fastrepl.report(
         {
             "eval": "LLMClassificationHead",
             "model": model,
@@ -125,7 +125,7 @@ def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
         for name in ("accuracy", "mse", "mae")
     )
 
-    print(
+    fastrepl.report(
         {
             "eval": "LLMClassificationHeadCOT",
             "model": model,
@@ -180,7 +180,7 @@ def test_llm_grading_head(dataset, model, references):
         for name in ("accuracy", "mse", "mae")
     )
 
-    print(
+    fastrepl.report(
         {
             "eval": "LLMGradingHead",
             "model": model,
@@ -224,7 +224,7 @@ def test_grading_head_cot(dataset, model):
         for name in ("accuracy", "mse", "mae")
     )
 
-    print(
+    fastrepl.report(
         {
             "eval": "LLMGradingHeadCOT",
             "model": model,

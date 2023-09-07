@@ -20,3 +20,5 @@ from fastrepl.runner import (
     LocalRunner,
     RemoteRunner,
 )
+
+from fastrepl.pytest_plugin import report

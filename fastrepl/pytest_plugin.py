@@ -1,11 +1,18 @@
-from typing import Optional, List
+from typing import Optional, List, Any
 
+import json
 import pytest
 import _pytest.terminal
 
 from fastrepl.utils import getenv
 
 run_url: Optional[str] = None
+
+
+def report(data: Any) -> None:
+    s = json.dumps(data)
+    # NOTE: This will be later parsed by fastrepl
+    print(f"__FASTREPL_START_{s}_FASTREPL_END__")
 
 
 def set_proxy():
