@@ -1,7 +1,7 @@
-Welcome to ⚡♾️ FastREPL ! 
+Welcome to FastREPL ! 
 ##########################
 
-FastREPL enables simple `Run-Eval-Polish Loop` for LLM Applications.
+FastREPL enables ⚡fast `Run-Eval-Polish Loop` for LLM Applications.
 
 🚀 Why FastREPL?
 ***************************

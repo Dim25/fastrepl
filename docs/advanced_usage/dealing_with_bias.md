@@ -4,18 +4,23 @@ It is very important to **properly handle bias throughout the evaluation process
 ## Model Bias
 > `TL;DR` Compare multiple models while doing evaluation
 ### Problem
-Different model has different bias. For example, [GPT-4 favors itself with a 10% higher win rate while Claude-v1 favors itself with a 25% higher win rate.](https://arxiv.org/pdf/2306.05685.pdf) Although the author did express some uncertainty:
+One form of model bias is the `self-enhancement bias`.
 
-> However, they also favor other models and GPT-3.5 does not favor itself. Due to limited data and small differences, our study cannot determine whether the models exhibit a self-enhancement bias. Conducting a controlled study is challenging because we cannot easily rephrase a response to fit the style of another model without changing the quality.
+For example, [GPT-4 favors itself with a 10% higher win rate while Claude-v1 favors itself with a 25% higher win rate.](https://arxiv.org/pdf/2306.05685.pdf) Although the author did express some uncertainty:
+
+> However, they also favor other models and GPT-3.5 does not favor itself. Due to limited data and small differences, our study cannot determine whether the models exhibit a self-enhancement bias.
 
 Additionally, this tendency can be observed in [AlpacaEval](https://tatsu-lab.github.io/alpaca_eval/). When the evaluator is `GPT-4`, the ranking is as follows: `Claude 2 > ChatGPT > Claude`. However, when `Claude` serves as the evaluator, the ranking changes to `Claude > Claude 2 > ChatGPT`.
+
+Although most use cases for evaluation in applications do not involve comparing the output of two models, it is worth noting that different models can have different biases.
 
 ### Solution
 `fastrepl` uses [`litellm`](https://github.com/BerriAI/litellm) under the hood, which allows you to use any model you want.
 
 ```python
 eval = fastrepl.LLMClassificationHead(
-    model="gpt-3.5-turbo", # can be any model that litellm supports
+    # can be gpt-4, claude-2, j2-ultra, command-nightly, togethercomputer/llama-2-70b-chat and more...
+    model="gpt-3.5-turbo",
     ...
 )
 ```
