@@ -82,7 +82,9 @@ class LLMEvaluationHead(BaseEvalNode):
         return llm.completion(
             model=self.model,
             messages=self.messages(sample, context),
-            max_tokens=1,  # NOTE: when using logit_bias for classification, max_tokens should be 1
+            # NOTE: when using logit_bias for classification, max_tokens should be 1
+            # max_tokens=2 is workaround. TODO
+            max_tokens=2 if "together" in self.model else 1,
             logit_bias=logit_bias_from(self.model, [str(i) for i in self.options]),
         )["choices"][0]["message"]["content"]
 
@@ -96,7 +98,7 @@ class LLMEvaluationHead(BaseEvalNode):
         result = result.strip()
 
         # NOTE: Although we use max_token=1 and logit_bias, we still can get something different.
-        # This is because 1. some LLM provider does not have logit_bias option. 2
+        # This is because 1. some LLM provider does not have logit_bias option
         # 2. for Cohere, max logit_bias value(=10) is not enough to force the model. (Not sure why.)
         if result not in self.options:
             warn(InvalidPredictionWarning, context=f"{result!r} not in {self.options}.")

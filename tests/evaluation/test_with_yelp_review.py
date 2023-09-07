@@ -2,6 +2,7 @@ import pytest
 from datasets import Dataset, load_dataset
 
 import fastrepl
+from fastrepl.utils import number
 
 
 def eval_name(evaluator: str, model: str) -> str:
@@ -33,11 +34,7 @@ def label2number(example):
 
 
 def grade2number(example):
-    if example["prediction"] is None:
-        return example
-
-    example["prediction"] = float(example["prediction"])
-
+    example["prediction"] = number(example["prediction"])
     return example
 
 
@@ -58,7 +55,6 @@ def dataset() -> Dataset:
     "model, position_debias_strategy",
     [
         ("gpt-3.5-turbo", "shuffle"),
-        # ("togethercomputer/llama-2-70b-chat", "shuffle"),
     ],
 )
 @pytest.mark.fastrepl
@@ -103,7 +99,6 @@ def test_llm_classification_head(dataset, model, position_debias_strategy):
     "model, position_debias_strategy",
     [
         ("gpt-3.5-turbo", "shuffle"),
-        # ("togethercomputer/llama-2-70b-chat", "shuffle"),
     ],
 )
 @pytest.mark.fastrepl
@@ -145,14 +140,23 @@ def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
 
 
 @pytest.mark.parametrize(
-    "model",
+    "model, references",
     [
-        ("gpt-3.5-turbo"),
-        # ("togethercomputer/llama-2-70b-chat"),
+        (
+            "gpt-3.5-turbo",
+            [],
+        ),
+        (
+            "togethercomputer/llama-2-70b-chat",
+            [
+                ("Text to grade: this place is nice!", "4"),
+                ("Text to grade: this place is so bad", "1"),
+            ],
+        ),
     ],
 )
 @pytest.mark.fastrepl
-def test_llm_grading_head(dataset, model):
+def test_llm_grading_head(dataset, model, references):
     eval = fastrepl.Evaluator(
         pipeline=[
             fastrepl.LLMGradingHead(
@@ -160,6 +164,7 @@ def test_llm_grading_head(dataset, model):
                 context="You will get a input text from Yelp review. Grade user's satisfaction from 1 to 5.",
                 number_from=1,
                 number_to=5,
+                references=references,
             )
         ]
     )
@@ -193,7 +198,6 @@ def test_llm_grading_head(dataset, model):
     "model",
     [
         ("gpt-3.5-turbo"),
-        # ("togethercomputer/llama-2-70b-chat"),
     ],
 )
 @pytest.mark.fastrepl

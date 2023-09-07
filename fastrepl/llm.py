@@ -96,7 +96,6 @@ SUPPORTED_MODELS = Literal[  # pragma: no cover
     "gpt-4-0613",
     "j2-ultra",
     "command-nightly",
-    "replicate/replicate/llama-2-70b-chat",
     "togethercomputer/llama-2-70b-chat",
     "chat-bison",
     "chat-bison@001",
