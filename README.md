@@ -3,15 +3,8 @@
 # ⚡♾️ FastREPL
 Fast `Run-Eval-Polish Loop` for LLM App.
 
-
-## Installation
-```bash
-pip install fastrepl
-```
-
-## Examples
-The [Basic example](/examples/basic.ipynb) runs without errors on the latest commit, and the [other examples](/examples) are also error-free in the latest release. This is assuranced through [workflows](.github/workflows). If you do come across an error, kindly [report it](https://github.com/yujonglee/fastrepl/issues), and I will address it ASAP.
-
+## Quickstart
+Documentation is [here](https://docs.fastrepl.com/getting_started/quickstart).
 
 ## Contributing
 Any kind of contribution is welcome. 
