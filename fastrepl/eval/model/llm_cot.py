@@ -22,7 +22,7 @@ class LLMChainOfThought(BaseEvalNode):
         self, sample: str, global_context: str, local_context: Optional[str]
     ) -> Dict[str, str]:
         @prompt
-        def p(labels, context):
+        def p(context):
             """If user gave you the text, do step-by-step thinking about it within 3 sentences.
 
             When doing step-by-step thinking, you must consider the following:

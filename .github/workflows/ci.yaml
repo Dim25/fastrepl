@@ -63,9 +63,6 @@ jobs:
       - name: Test
         run: task test:ci
 
-      - name: Run basic example
-        run: task run:example:basic
-
       - name: Upload test coverage
         uses: codecov/codecov-action@v3
         with:

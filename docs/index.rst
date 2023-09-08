@@ -21,29 +21,22 @@ No. **FastREPL** is only for evaluation and testing.
    :caption: Getting Started
    :hidden:
 
-   getting_started/quickstart.md
+   getting_started/quickstart.ipynb
    getting_started/design_goals.md
-   getting_started/concepts.md
-   getting_started/model_graded_eval.md
    getting_started/env.md
+   .. getting_started/concepts.md
 
 .. toctree::
    :maxdepth: 1
-   :caption: Basic Usage
+   :caption: Guides
    :hidden:
 
-   basic_usage/dataset_loading.md
-   basic_usage/model_graded_eval.md
-   basic_usage/meta_eval.md
+   guides/model_graded_eval.md
+   guides/meta_eval.md
+   guides/human_eval.ipynb
+   guides/dealing_with_bias.md
+   guides/argilla.md
    
-.. toctree::
-   :maxdepth: 1
-   :caption: Advanced Usage
-   :hidden:
-   
-   advanced_usage/human_eval.md
-   advanced_usage/dealing_with_bias.md
-
 .. toctree::
    :maxdepth: 1
    :caption: Miscellaneous

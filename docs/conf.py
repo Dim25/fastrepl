@@ -19,7 +19,7 @@ version = importlib.metadata.version("fastrepl")
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 
-project = "♾️ FastREPL"
+project = "⚡♾️ FastREPL"
 copyright = "2023, yujonglee"
 author = "yujonglee"
 
