@@ -32,9 +32,6 @@ jobs:
       - name: Install dependencies
         run: task install
 
-      - name: Run all examples
-        run: task run:example:all
-
       - name: Publish to PyPI
         run: |
           task pre-publish

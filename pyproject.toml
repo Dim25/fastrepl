@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastrepl"
-version = "0.0.1"
+version = "0.0.2"
 description = "Fast Run-Eval-Polish Loop for LLM App"
 authors = ["yujonglee <yujonglee.dev@gmail.com>"]
 readme = "README.md"
