@@ -1,7 +1,7 @@
 Welcome to FastREPL ! 
 ##########################
 
-FastREPL enables ⚡fast `Run-Eval-Polish Loop` for LLM Applications.
+`FastREPL <https://github.com/fastrepl/fastrepl>`_ enables ⚡fast `Run-Eval-Polish Loop` for LLM Applications.
 
 🚀 Why FastREPL?
 ***************************
