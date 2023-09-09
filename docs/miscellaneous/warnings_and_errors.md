@@ -10,6 +10,7 @@ Predicted label or number is not within given labels or within range. `fastrepl`
 
 ### IncompletePrediction
 When calculating metric, `prediction is None`. This `prediction-reference pair` will be skipped.
+`prediction is None` when LLM API call or [consensus](/guides/dealing_with_bias) failed. If want to manually fill out the value. Take a look at [human-eval](/guides/human_eval.ipynb).
 
 ### CompletionTruncated
 LLM completion is truncated due to `max_tokens`. Note this can be happened even for `max_tokens=1` and maximum `logit_bias` for desired tokens.
