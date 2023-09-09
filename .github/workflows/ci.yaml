@@ -52,7 +52,9 @@ jobs:
           python -m pip install poetry==${{ matrix.poetry-version }}
 
       - name: Install dependencies
-        run: task install
+        run: |
+          poetry check --lock
+          task install
 
       - name: Lint
         run: task lint

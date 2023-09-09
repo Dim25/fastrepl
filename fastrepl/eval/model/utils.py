@@ -23,10 +23,10 @@ def logit_bias_from(
             raise ValueError(f"{s!r} is not a single token in {model!r}")
         return ids[0]
 
-    if model == "command-nightly":
+    if model.startswith("command"):
         COHERE_MAX = 10
         return {_get_token_id(s): COHERE_MAX for s in strings}
-    elif model in ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]:
+    elif model.startswith("gpt"):
         OPENAI_MAX = 100
         return {_get_token_id(s): OPENAI_MAX for s in strings}
     else:
