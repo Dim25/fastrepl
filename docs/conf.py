@@ -11,9 +11,11 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 
-import importlib.metadata
+# import importlib.metadata
 
-version = importlib.metadata.version("fastrepl")
+# version = importlib.metadata.version("fastrepl")
+# TODO: importlib.metadata only works after install
+version = "0.0.2"
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
