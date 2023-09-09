@@ -27,7 +27,7 @@ from fastrepl.eval.model.utils import (
 
 class LLMEvaluationHeadParams(TypedDict):
     context: str
-    options: Iterable[str]
+    options: NotRequired[Iterable[str]]  # TODO: It is actually required.
     model: NotRequired[llm.SUPPORTED_MODELS]
     rg: NotRequired[random.Random]
     references: NotRequired[List[Tuple[str, str]]]

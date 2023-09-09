@@ -41,6 +41,7 @@ def pytest_sessionstart(session: pytest.Session):
         # NOTE: This will be provided in Github App
         api_base = getenv("LITELLM_PROXY_API_BASE", "")
         litellm.api_base = api_base if api_base != "" else None
+        litellm.headers = {"Authorization": getenv("LITELLM_PROXY_API_KEY", "")}
 
 
 @pytest.hookimpl(trylast=True)
@@ -54,7 +55,3 @@ def pytest_collection_modifyitems(config: pytest.Config, items: List[pytest.Item
                             "--fastrepl is not specified, skipping tests with fastrepl marker"
                         )
                     )
-    else:  # TODO: This has no effect
-        for item in items:
-            if item.get_closest_marker("fastrepl"):
-                item.fixturenames.append("report")

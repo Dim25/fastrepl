@@ -75,13 +75,14 @@ def test_llm_classification_head(
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(label2number)
 
-    accuracy, mse, mae = (
-        fastrepl.load_metric(name).compute(
-            predictions=result["prediction"],
-            references=result["reference"],
-        )[name]
-        for name in ("accuracy", "mse", "mae")
-    )
+    predictions = result["prediction"]
+    references = result["reference"]
+
+    # fmt: off
+    accuracy = fastrepl.load_metric("accuracy").compute(predictions, references)["accuracy"]
+    mse = fastrepl.load_metric("accuracy").compute(predictions, references)["mse"]
+    mae = fastrepl.load_metric("accuracy").compute(predictions, references)["mae"]
+    # fmt: on
 
     report.add(
         {
@@ -121,13 +122,14 @@ def test_llm_classification_head_cot(
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(label2number)
 
-    accuracy, mse, mae = (
-        fastrepl.load_metric(name).compute(
-            predictions=result["prediction"],
-            references=result["reference"],
-        )[name]
-        for name in ("accuracy", "mse", "mae")
-    )
+    predictions = result["prediction"]
+    references = result["reference"]
+
+    # fmt: off
+    accuracy = fastrepl.load_metric("accuracy").compute(predictions, references)["accuracy"]
+    mse = fastrepl.load_metric("accuracy").compute(predictions, references)["mse"]
+    mae = fastrepl.load_metric("accuracy").compute(predictions, references)["mae"]
+    # fmt: on
 
     report.add(
         {
@@ -176,13 +178,14 @@ def test_llm_grading_head(dataset, model, references, report: fastrepl.TestRepor
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(grade2number)
 
-    accuracy, mse, mae = (
-        fastrepl.load_metric(name).compute(
-            predictions=result["prediction"],
-            references=result["reference"],
-        )[name]
-        for name in ("accuracy", "mse", "mae")
-    )
+    predictions = result["prediction"]
+    references = result["reference"]
+
+    # fmt: off
+    accuracy = fastrepl.load_metric("accuracy").compute(predictions, references)["accuracy"]
+    mse = fastrepl.load_metric("accuracy").compute(predictions, references)["mse"]
+    mae = fastrepl.load_metric("accuracy").compute(predictions, references)["mae"]
+    # fmt: on
 
     report.add(
         {
@@ -220,13 +223,14 @@ def test_grading_head_cot(dataset, model, report: fastrepl.TestReport):
     result = fastrepl.LocalRunner(evaluator=eval, dataset=dataset).run()
     result = result.map(grade2number)
 
-    accuracy, mse, mae = (
-        fastrepl.load_metric(name).compute(
-            predictions=result["prediction"],
-            references=result["reference"],
-        )[name]
-        for name in ("accuracy", "mse", "mae")
-    )
+    predictions = result["prediction"]
+    references = result["reference"]
+
+    # fmt: off
+    accuracy = fastrepl.load_metric("accuracy").compute(predictions, references)["accuracy"]
+    mse = fastrepl.load_metric("accuracy").compute(predictions, references)["mse"]
+    mae = fastrepl.load_metric("accuracy").compute(predictions, references)["mae"]
+    # fmt: on
 
     report.add(
         {
