@@ -58,7 +58,9 @@ def dataset() -> Dataset:
     ],
 )
 @pytest.mark.fastrepl
-def test_llm_classification_head(dataset, model, position_debias_strategy):
+def test_llm_classification_head(
+    dataset, model, position_debias_strategy, report: fastrepl.TestReport
+):
     eval = fastrepl.Evaluator(
         pipeline=[
             fastrepl.LLMClassificationHead(
@@ -81,7 +83,7 @@ def test_llm_classification_head(dataset, model, position_debias_strategy):
         for name in ("accuracy", "mse", "mae")
     )
 
-    fastrepl.report(
+    report.add(
         {
             "eval": "LLMClassificationHead",
             "model": model,
@@ -102,7 +104,9 @@ def test_llm_classification_head(dataset, model, position_debias_strategy):
     ],
 )
 @pytest.mark.fastrepl
-def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
+def test_llm_classification_head_cot(
+    dataset, model, position_debias_strategy, report: fastrepl.TestReport
+):
     eval = fastrepl.Evaluator(
         pipeline=[
             fastrepl.LLMClassificationHeadCOT(
@@ -125,7 +129,7 @@ def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
         for name in ("accuracy", "mse", "mae")
     )
 
-    fastrepl.report(
+    report.add(
         {
             "eval": "LLMClassificationHeadCOT",
             "model": model,
@@ -156,7 +160,7 @@ def test_llm_classification_head_cot(dataset, model, position_debias_strategy):
     ],
 )
 @pytest.mark.fastrepl
-def test_llm_grading_head(dataset, model, references):
+def test_llm_grading_head(dataset, model, references, report: fastrepl.TestReport):
     eval = fastrepl.Evaluator(
         pipeline=[
             fastrepl.LLMGradingHead(
@@ -180,7 +184,7 @@ def test_llm_grading_head(dataset, model, references):
         for name in ("accuracy", "mse", "mae")
     )
 
-    fastrepl.report(
+    report.add(
         {
             "eval": "LLMGradingHead",
             "model": model,
@@ -201,7 +205,7 @@ def test_llm_grading_head(dataset, model, references):
     ],
 )
 @pytest.mark.fastrepl
-def test_grading_head_cot(dataset, model):
+def test_grading_head_cot(dataset, model, report: fastrepl.TestReport):
     eval = fastrepl.Evaluator(
         pipeline=[
             fastrepl.LLMGradingHeadCOT(
@@ -224,7 +228,7 @@ def test_grading_head_cot(dataset, model):
         for name in ("accuracy", "mse", "mae")
     )
 
-    fastrepl.report(
+    report.add(
         {
             "eval": "LLMGradingHeadCOT",
             "model": model,

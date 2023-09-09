@@ -1,26 +1,22 @@
-from typing import Optional, List, Any
+from typing import List, Any
 
 import json
 import pytest
-import _pytest.terminal
 
 from fastrepl.utils import getenv
 
-run_url: Optional[str] = None
+
+class TestReport:
+    @staticmethod
+    def add(data: Any) -> None:
+        s = json.dumps(data)
+        # NOTE: This will be later parsed by fastrepl
+        print(f"__FASTREPL_START_{s}_FASTREPL_END__")
 
 
-def report(data: Any) -> None:
-    s = json.dumps(data)
-    # NOTE: This will be later parsed by fastrepl
-    print(f"__FASTREPL_START_{s}_FASTREPL_END__")
-
-
-def set_proxy():
-    import litellm
-
-    # NOTE: This will be provided in Github App
-    api_base = getenv("LITELLM_PROXY_API_BASE", "")
-    litellm.api_base = api_base if api_base != "" else None
+@pytest.fixture(scope="session")
+def report():
+    return TestReport
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -40,15 +36,14 @@ def pytest_configure(config: pytest.Config):
 
 def pytest_sessionstart(session: pytest.Session):
     if session.config.getoption("--fastrepl"):
-        set_proxy()
+        import litellm
+
+        # NOTE: This will be provided in Github App
+        api_base = getenv("LITELLM_PROXY_API_BASE", "")
+        litellm.api_base = api_base if api_base != "" else None
 
 
-def pytest_sessionfinish(session: pytest.Session):
-    global run_url
-    if session.config.getoption("--fastrepl"):
-        run_url = "https://docs.fastrepl.com"
-
-
+@pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(config: pytest.Config, items: List[pytest.Item]):
     if not config.getoption("--fastrepl"):
         for item in items:
@@ -59,10 +54,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: List[pytest.Item
                             "--fastrepl is not specified, skipping tests with fastrepl marker"
                         )
                     )
-
-
-def pytest_terminal_summary(terminalreporter: _pytest.terminal.TerminalReporter):
-    global run_url
-    if run_url:
-        terminalreporter.write_sep("=", "fastrepl summary", purple=True)
-        terminalreporter.write_line(f"{run_url}")
+    else:  # TODO: This has no effect
+        for item in items:
+            if item.get_closest_marker("fastrepl"):
+                item.fixturenames.append("report")

@@ -21,4 +21,4 @@ from fastrepl.runner import (
     RemoteRunner,
 )
 
-from fastrepl.pytest_plugin import report
+from fastrepl.pytest_plugin import TestReport
