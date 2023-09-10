@@ -9,3 +9,4 @@ from fastrepl.utils.prompt import prompt
 from fastrepl.utils.console import console
 from fastrepl.utils.debug import debug, DEBUG
 from fastrepl.utils.string import truncate, number
+from fastrepl.utils.kappa import kappa

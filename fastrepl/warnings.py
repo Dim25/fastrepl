@@ -46,6 +46,12 @@ class InvalidPredictionWarning(Warning):
         return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#invalidprediction"  # pragma: no cover
 
 
+class InconsistentPredictionWarning(Warning):
+    @staticmethod
+    def doc_url() -> str:
+        return "https://docs.fastrepl.com/miscellaneous/warnings_and_errors#inconsistentprediction"  # pragma: no cover
+
+
 class IncompletePredictionWarning(Warning):
     @staticmethod
     def doc_url() -> str:

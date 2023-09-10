@@ -1,5 +1,5 @@
 class LLMCache:
-    llm_cache: bool = True
+    llm_cache: bool = False
 
     @staticmethod
     def enabled() -> bool:

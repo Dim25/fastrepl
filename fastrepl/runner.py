@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, List
 
 from multiprocessing.pool import ThreadPool
 from datasets import Dataset
-from rich.progress import Progress
+from rich.progress import Progress, TaskID
 
 import fastrepl
-from fastrepl.utils import getenv
+from fastrepl.utils import getenv, kappa
+from fastrepl.warnings import warn, InconsistentPredictionWarning
 
 NUM_THREADS = getenv("NUM_THREADS", 8)
 
@@ -33,19 +34,38 @@ class LocalRunner(BaseRunner):
     def _run_eval(self, sample: str) -> Optional[str]:
         return self._evaluator.run(sample)
 
-    def run(self) -> Dataset:
+    def _run(self, progress: Progress, task_id: TaskID) -> List[Optional[str]]:
         results = []
+        with ThreadPool(NUM_THREADS) as pool:
+            for result in pool.imap(self._run_eval, self._dataset[self._input_feature]):
+                results.append(result)
+                progress.update(task_id, advance=1, refresh=True)
+        return results
+
+    def run(self, num=1) -> Dataset:
         with Progress() as progress:
-            task = progress.add_task("[cyan]Processing...", total=len(self._dataset))
+            task_id = progress.add_task(
+                "[cyan]Processing...",
+                total=len(self._dataset) * num,
+            )
 
-            with ThreadPool(NUM_THREADS) as pool:
-                for result in pool.imap(
-                    self._run_eval, self._dataset[self._input_feature]
-                ):
-                    results.append(result)
-                    progress.update(task, advance=1, refresh=True)
+            if num == 1:
+                return self._dataset.add_column(
+                    self._output_feature,
+                    self._run(progress, task_id),
+                )
+            elif num == 2:
+                predictions = [self._run(progress, task_id) for _ in range(num)]
 
-        return self._dataset.add_column(self._output_feature, results)
+                value = kappa(*predictions)
+                if value < 0.4:
+                    warn(InconsistentPredictionWarning, context=value)
+
+                return self._dataset.add_column(
+                    self._output_feature, list(zip(*predictions))
+                )
+            else:
+                raise NotImplementedError
 
 
 class LocalRunnerREPL(LocalRunner):
