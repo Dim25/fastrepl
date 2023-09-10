@@ -142,6 +142,7 @@ def completion(
                 logit_bias=logit_bias,
                 max_tokens=max_tokens,
                 force_timeout=20,
+                custom_llm_provider="openai",
             )
 
             content = result["choices"][0]["message"]["content"]
