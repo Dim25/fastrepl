@@ -22,9 +22,9 @@ No. **FastREPL** is only for evaluation and testing.
    :hidden:
 
    getting_started/quickstart.ipynb
+   getting_started/detailed_tutorial.ipynb
    getting_started/design_goals.md
    getting_started/env.md
-   .. getting_started/concepts.md
 
 .. toctree::
    :maxdepth: 1
@@ -36,6 +36,7 @@ No. **FastREPL** is only for evaluation and testing.
    guides/human_eval.ipynb
    guides/dealing_with_bias.md
    guides/argilla.md
+   guides/llama_index_pg_great_work.ipynb
    
 .. toctree::
    :maxdepth: 1
