@@ -9,7 +9,7 @@ dataset_rg = rg.load(rg_name)
 dataset_ds = dataset_rg.to_datasets()
 ```
 
-You want need to remove unnecessary columns and rename the rest to something like `input` and `reference`.
+You might want to remove unnecessary columns and rename the rest to something like `input` and `reference`.
 
 ```python
 input_ds = dataset_ds.remove_columns(
