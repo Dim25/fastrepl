@@ -59,7 +59,7 @@ class LocalRunner(BaseRunner):
 
                 value = kappa(*predictions)
                 if value < 0.4:
-                    warn(InconsistentPredictionWarning, context=value)
+                    warn(InconsistentPredictionWarning, context=str(value))
 
                 return self._dataset.add_column(
                     self._output_feature, list(zip(*predictions))

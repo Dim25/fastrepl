@@ -21,7 +21,10 @@ warnings.formatwarning = warning_formatter
 
 
 def warn(category=Warning, context=""):
-    warnings.warn(context, category)
+    try:  # TODO: to avoid `cannot use a string pattern on a bytes-like object`. this sometimes raises, not sure why
+        warnings.warn(context, category)
+    except:
+        warnings.warn("", category)
 
 
 class Warning(UserWarning):
