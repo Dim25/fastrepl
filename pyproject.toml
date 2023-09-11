@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastrepl"
-version = "0.0.3"
+version = "0.0.4"
 description = "Fast Run-Eval-Polish Loop for LLM App"
 authors = ["yujonglee <yujonglee.dev@gmail.com>"]
 readme = "README.md"
@@ -25,10 +25,10 @@ torch = ">=2.0.0, !=2.0.1"
 datasets = "^2.14.4"
 backoff = "^2.2.1"
 statsmodels = "^0.14.0"
+pytest = "^7.4"
 
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.1"
 pytest-xdist = "^3.3.1"
 pytest-benchmark = "^4.0.0"
 pytest-cov = "^4.1.0"
@@ -67,4 +67,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [project.entry-points.pytest11]
-pytest-fastrepl = "fastrepl.pytest_plugin"
+pfastrepl = "fastrepl.pytest_plugin"

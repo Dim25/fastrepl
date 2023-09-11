@@ -15,7 +15,7 @@
 
 # version = importlib.metadata.version("fastrepl")
 # TODO: importlib.metadata only works after install
-version = "0.0.3"
+version = "0.0.4"
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
