@@ -521,13 +521,13 @@ test = ["coverage (>=4.2)", "flake8 (>=3.0.4)", "path.py (>=11.5.0)", "pytest (>
 
 [[package]]
 name = "cohere"
-version = "4.21"
+version = "4.24"
 description = ""
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "cohere-4.21-py3-none-any.whl", hash = "sha256:5eb81db62e78b3156e734421cc3e657054f9d9f1d68b9f38cf48fe3a8ae40dbc"},
-    {file = "cohere-4.21.tar.gz", hash = "sha256:f611438f409dfc5d5a0a153a585349f5a80b169c7102b5994d9999ecf8440866"},
+    {file = "cohere-4.24-py3-none-any.whl", hash = "sha256:04b5b05411724162cc6c620006b2984459fe2a6e23f5bf75489a83d4659a9fbc"},
+    {file = "cohere-4.24.tar.gz", hash = "sha256:ed94200115c4147cdf4e79467d591f1e4892cc8984558e5e9d104ae1e6287470"},
 ]
 
 [package.dependencies]
